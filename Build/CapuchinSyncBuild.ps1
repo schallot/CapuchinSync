@@ -63,6 +63,8 @@ namespace MsBuildLocator
 
 Add-Type -TypeDefinition $Source -Language CSharp  
 
+./Nuget.exe restore ..\Code\CapuchinSync.sln
+
 $msbuild = [MsBuildLocator.MsBuildInstallation]::GetNewestInstalledVersion().Path
 $solution = (Join-Path (Get-Script-Directory) "\..\Code\CapuchinSync.sln")
 
