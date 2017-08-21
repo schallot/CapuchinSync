@@ -5,7 +5,7 @@
         /// <summary>
         /// The name of the hash file that we'll create in or look for in the source folder.
         /// </summary>
-        public const string HashFileName = ".dirSyncHashes";
+        public const string HashFileName = ".capuchinSync";
 
         /// <summary>
         /// A return code that indicates that everything worked as expected.
