@@ -18,4 +18,4 @@ For example, `CapuchinSync source:\\remoteMachine\share\MyAwesomeBinaries;destin
 will ensure that all files in `C:\Development\binaries` match those in `\\remoteMachine\share\MyAwesomeBinaries`.  What's more, if you have multiple directories to synchronize, you can pass in muliple source\destination pairs to synchronize them all at once, taking advantage of the fact that CapuchinSync will look across all source directories for duplicates before starting the transfer.  Thus synchronizing multiple directories at once can end up being faster than synchronizing them individually.
 
 **Notes**
-CapuchinSync is built with the awesome [AppVeyor](www.appveyor.com) CI provider.  Two hours ago, I had never heard of them, but in that time I've been completely impressed.  You can see the builds [here](https://ci.appveyor.com/project/schallot/capuchinsync).
+CapuchinSync is built with the awesome [AppVeyor](https://www.appveyor.com) CI provider.  Two hours ago, I had never heard of them, but in that time I've been completely impressed.  You can see the builds [here](https://ci.appveyor.com/project/schallot/capuchinsync).
