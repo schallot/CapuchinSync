@@ -1,0 +1,2 @@
+powershell set-executionpolicy unrestricted
+pause

@@ -1,0 +1,4 @@
+Code/packages/
+Code/.vs/
+**/bin/
+**/obj/
