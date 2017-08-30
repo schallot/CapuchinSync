@@ -8,7 +8,8 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("CapuchinSync.Core.Tests")]
 [assembly: AssemblyDescription("Tests for a utility for synchronizing directories using precomputed hashes.")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyProduct("CapuchinSync.Core.Tests")]
+// NOTE:  The <COMMITID> token will be replaced with the current commit's id from Git by the StampAssembly build script
+[assembly: AssemblyProduct("CapuchinSync.Core.Tests <COMMITID>")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -30,8 +31,10 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
+
+// NOTE: The "9999.9999.9999.9999" token will be replaced with the current assembly version info by the StampAssembly script
+[assembly: AssemblyVersion("9999.9999.9999.9999")]
+[assembly: AssemblyFileVersion("9999.9999.9999.9999")]
 [assembly: AssemblyCompany("The Petoria Group <PetoriaGroup.com>")]
 [assembly: AssemblyCopyright("Copyright © 2017 The Petoria Group")]
 
