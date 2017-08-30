@@ -10,6 +10,18 @@ function Get-Script-Directory
 }
 
 function Write-Assembly-Info($filePath, $majorNumber, $minorNumber, $buildNumber, $commitId){
+	$filePath = [System.IO.Path]::GetFullPath($filePath)
+	$directory = [System.IO.Path]::GetDirectoryName($filePath)
+	$fileName = [System.IO.Path]::GetFileName($filePath)
+	$originalWorkingDirectory = Get-Location
+	Set-Location $directory
+
+	# Checkout the latest version of the file so that we know what we're updating.
+	# Note that this does mean that you'll want to commit any changes made to this file before building.
+	git checkout --force $fileName
+
+	Set-Location $originalWorkingDirectory
+
 	$content = [System.IO.File]::ReadAllText($filePath)
 	$version = '"{0}.{1}.{2}"' -f $majorNumber, $minorNumber, $buildNumber 
 	$content = $content.Replace('"9999.9999.9999.9999"', $version)
@@ -17,10 +29,12 @@ function Write-Assembly-Info($filePath, $majorNumber, $minorNumber, $buildNumber
 	[System.IO.File]::WriteAllText($filePath, $content)
 }
 
-$file = (Join-Path (Get-Script-Directory) "..\..\Code\CapuchinSync.Hash\Properties\AssemblyInfo.cs")
 $major = 1
 $minor = 2
 $build = 3
 $commit = "abcd-efgh-ijklmnop-qrs-tuv-wxyz"
 
-(Write-Assembly-Info $file $major $minor $build $commit)
+Get-ChildItem (Join-Path (Get-Script-Directory) "..\..") -Recurse -Filter AssemblyInfo.cs | 
+Foreach-Object {
+	(Write-Assembly-Info $_.FullName $major $minor $build $commit)
+}
