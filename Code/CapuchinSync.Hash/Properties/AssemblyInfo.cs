@@ -9,6 +9,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyDescription("A command-line utility for generating a dictionary of hashes used for synchronizing directories using the CapuchinSync tool.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("The Petoria Group <PetoriaGroup.com>")]
+// NOTE:  The <COMMITID> token will be replaced with the current commit's id from Git by the StampAssembly script
 [assembly: AssemblyProduct("CapuchinSync.Hash <COMMITID>")]
 [assembly: AssemblyCopyright("Copyright © 2017 The Petoria Group")]
 [assembly: AssemblyTrademark("")]
@@ -32,5 +33,7 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
+
+// NOTE: The "9999.9999.9999.9999" token will be replaced with the current assembly version info by the StampAssembly script
 [assembly: AssemblyVersion("9999.9999.9999.9999")]
 [assembly: AssemblyFileVersion("9999.9999.9999.9999")]
