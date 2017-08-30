@@ -8,6 +8,7 @@
     <RootNamespace>StampAssembly</RootNamespace>
     <AssemblyName>StampAssembly</AssemblyName>
     <Name>StampTheAssemb</Name>
+    <DebugArguments>-build 33 -minor 4</DebugArguments>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>

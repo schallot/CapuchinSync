@@ -1,6 +1,13 @@
 ﻿#############################################################################################
-### Attempts to find the location of MSBuild
+### Updates the various AssemblyInfo.cs files in the repository so that they are stamped with
+### the current build number and the current commit's id.
 #############################################################################################
+
+param(
+	[Int32]$major=0, # The current major version number (eg, the 1 in 1.2.3)
+	[Int32]$minor=0, # The current minor version number (the 2 in 1.2.3)
+	[Int32]$build=0  # The current build number (the 3 in 1.2.3)
+)
 
 function Get-Script-Directory
 {    
@@ -30,10 +37,6 @@ function Write-Assembly-Info($filePath, $majorNumber, $minorNumber, $buildNumber
 }
 
 $commitId = (git rev-parse HEAD).Trim()
-
-$major = 1
-$minor = 2
-$build = 3
 
 Get-ChildItem (Join-Path (Get-Script-Directory) "..\..") -Recurse -Filter AssemblyInfo.cs | 
 Foreach-Object {
