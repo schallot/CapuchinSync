@@ -1,0 +1,39 @@
+version: '%majorVersion%.%minorVersion%.{build}'
+branches:
+  only:
+  - master
+skip_tags: true
+environment:
+  majorVersion: 1
+  minorVersion: 0
+before_build:
+- cmd: >-
+    nuget restore Code\CapuchinSync.sln
+
+    powershell .\Build\StampAssembly\StampAssembly.ps1 -major %majorVersion% -minor %minorVersion% -build %appveyor_build_number%
+build:
+  project: Code\CapuchinSync.sln
+  verbosity: detailed
+before_package:
+- cmd: >-
+    mkdir Artifacts
+
+    copy LICENSE Artifacts
+
+    copy Readme.md Artifacts\CapuchinSync_Readme_v%majorVersion%.%minorVersion%.%appveyor_build_number%.md
+
+    copy Code\CapuchinSync.Core\bin\Debug\*.* Artifacts
+
+    copy Code\CapuchinSync\bin\Debug\CapuchinSync.* Artifacts
+
+    copy Code\CapuchinSync.Hash\bin\Debug\CapuchinSync.Hash.* Artifacts
+artifacts:
+- path: Artifacts
+  name: CapuchinSync_v%majorVersion%.%minorVersion%.%appveyor_build_number%
+deploy:
+- provider: GitHub
+  tag: CapuchinSync_v$(majorVersion).$(minorVersion).$(appveyor_build_number)
+  release: CapuchinSync_v$(majorVersion).$(minorVersion).$(appveyor_build_number)
+  auth_token:
+    secure: #NOT_QUITE_READY_TO_STORE_EVEN_AN_ENCRYPTED_AUTH_TOKEN_HERE#
+  artifact: CapuchinSync_v%majorVersion%.%minorVersion%.%appveyor_build_number%
