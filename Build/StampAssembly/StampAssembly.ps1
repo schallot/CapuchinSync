@@ -29,12 +29,13 @@ function Write-Assembly-Info($filePath, $majorNumber, $minorNumber, $buildNumber
 	[System.IO.File]::WriteAllText($filePath, $content)
 }
 
+$commitId = (git rev-parse HEAD).Trim()
+
 $major = 1
 $minor = 2
 $build = 3
-$commit = "abcd-efgh-ijklmnop-qrs-tuv-wxyz"
 
 Get-ChildItem (Join-Path (Get-Script-Directory) "..\..") -Recurse -Filter AssemblyInfo.cs | 
 Foreach-Object {
-	(Write-Assembly-Info $_.FullName $major $minor $build $commit)
+	(Write-Assembly-Info $_.FullName $major $minor $build $commitId)
 }
