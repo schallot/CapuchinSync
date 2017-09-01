@@ -75,13 +75,23 @@ namespace CapuchinSync.Core
 
         private static ConsoleColor DefaultBackground { get; } = Console.BackgroundColor;
 
+        /// <summary>
+        /// An object that we'll use to indicate when a thread has exclusive access to the console.
+        /// Otherwise, two asynchronous processes can clobber each other's colorization of text.
+        /// </summary>
+        private static readonly object ConsoleWriterLock = new object();
+
         private void WriteToConsole(string message, ConsoleColor foregroundColor, ConsoleColor backgroundColor)
         {
-            Console.ForegroundColor = foregroundColor;
-            Console.BackgroundColor = backgroundColor;
-            Console.WriteLine(message);
-            Console.ForegroundColor = DefaultForeground;
-            Console.BackgroundColor = DefaultBackground;
+            // https://stackoverflow.com/questions/1522936/how-do-i-lock-the-console-across-threads-in-c-net
+            lock (ConsoleWriterLock)
+            {
+                Console.ForegroundColor = foregroundColor;
+                Console.BackgroundColor = backgroundColor;
+                Console.WriteLine(message);
+                Console.ForegroundColor = DefaultForeground;
+                Console.BackgroundColor = DefaultBackground;
+            }
         }
     }
 }
