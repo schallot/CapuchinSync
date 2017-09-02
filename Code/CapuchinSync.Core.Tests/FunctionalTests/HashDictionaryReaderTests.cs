@@ -12,9 +12,9 @@ namespace CapuchinSync.Core.Tests.FunctionalTests
         {
             var dictionaryContents =
                 @"2 files
-1234567890123456789012345678901234567890    somePath.txt
-1234567890123456789012345678901234567891    subdir\somePath2.txt
-";
+1234567890123456789012345678901234567890{delimiter}somePath.txt
+1234567890123456789012345678901234567891{delimiter}subdir\somePath2.txt
+".Replace("{delimiter}", HashDictionaryEntry.Delimiter);
             CreateFile(Constants.HashFileName, dictionaryContents);
             var reader = new HashDictionaryReader(HashUtility,TestSourceFolder, FileSystem, PathUtility);
             var hashDictionary = reader.Read();
@@ -46,8 +46,8 @@ namespace CapuchinSync.Core.Tests.FunctionalTests
         {
             var dictionaryContents =
                 @"1 files
-1234567890123456789012345678901234557890 /somePath.txt
-";
+1234567890123456789012345678901234557890{delimiter}/somePath.txt
+".Replace("{delimiter}", HashDictionaryEntry.Delimiter);
             CreateFile(Constants.HashFileName, dictionaryContents);
             var reader = new HashDictionaryReader(HashUtility, TestSourceFolder, FileSystem, PathUtility);
             var dictionary = reader.Read();
@@ -61,9 +61,9 @@ namespace CapuchinSync.Core.Tests.FunctionalTests
             var dictionaryContents =
                 @"1 files
 
-1234567890123456789012345678901234557890 /somePath.txt
+1234567890123456789012345678901234557890{delimiter}/somePath.txt
 
-";
+".Replace("{delimiter}", HashDictionaryEntry.Delimiter);
             CreateFile(Constants.HashFileName, dictionaryContents);
             var reader = new HashDictionaryReader(HashUtility, TestSourceFolder, FileSystem, PathUtility);
             var dictionary = reader.Read();
@@ -77,8 +77,8 @@ namespace CapuchinSync.Core.Tests.FunctionalTests
         {
             var dictionaryContents =
                 @"1 files
-12345678901234567890123456789012345Z7890 somePath.txt
-";
+12345678901234567890123456789012345Z7890{delimiter}somePath.txt
+".Replace("{delimiter}", HashDictionaryEntry.Delimiter);
             CreateFile(Constants.HashFileName, dictionaryContents);
             var reader = new HashDictionaryReader(HashUtility, TestSourceFolder, FileSystem, PathUtility);
             reader.Read();
@@ -90,8 +90,8 @@ namespace CapuchinSync.Core.Tests.FunctionalTests
         {
             var dictionaryContents =
                 @"blah files
-12345678901234567890123456789012345Z7890 somePath.txt
-";
+12345678901234567890123456789012345Z7890{delimiter}somePath.txt
+".Replace("{delimiter}", HashDictionaryEntry.Delimiter);
             CreateFile(Constants.HashFileName, dictionaryContents);
             var reader = new HashDictionaryReader(HashUtility, TestSourceFolder, FileSystem, PathUtility);
             reader.Read();
@@ -103,8 +103,8 @@ namespace CapuchinSync.Core.Tests.FunctionalTests
         {
             var dictionaryContents =
                 @"88 files
-1234567890123456789012345678901234537890 somePath.txt
-";
+1234567890123456789012345678901234537890{delimiter}somePath.txt
+".Replace("{delimiter}", HashDictionaryEntry.Delimiter);
             CreateFile(Constants.HashFileName, dictionaryContents);
             var reader = new HashDictionaryReader(HashUtility, TestSourceFolder, FileSystem, PathUtility);
             reader.Read();
