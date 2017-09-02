@@ -6,9 +6,24 @@ namespace CapuchinSync.Core.Hashes
     public class HashDictionaryEntry : Loggable
     {
         public string ErrorMessage { get; }
-        public HashDictionaryEntry(IHashUtility hash, string rootDirectory, string hashFileLine)
+        /// <summary>
+        /// The delimiter that will be used to separate entires in a hash dictionary line.
+        /// </summary>
+        public const string Delimiter = "\t";
+
+        private static string[] SplitDelimiters = {Delimiter};
+
+        private const int HashIndex = 0;
+        private const int FilePathIndex = 1;
+
+        /// <summary>
+        /// The string that will be used to indicate that a hash could not be computed for a file.
+        /// </summary>
+        private const string UnknownHash = "?";
+
+        public HashDictionaryEntry(IHashUtility hashUtility, string rootDirectory, string hashFileLine)
         {
-            if(hash == null) throw new ArgumentNullException(nameof(hash));
+            if(hashUtility == null) throw new ArgumentNullException(nameof(hashUtility));
             _dictionaryLine = hashFileLine;
             RootDirectory = rootDirectory;
             Debug($"Parsing hash dictionary line <{hashFileLine}> with root directory <{RootDirectory}>.");
@@ -23,30 +38,49 @@ namespace CapuchinSync.Core.Hashes
             }
             hashFileLine = hashFileLine.Trim();
 
-            // There's got to be enough length for a hash and at least a short file name
-            if (hashFileLine.Length < hash.HashLength + 3)
+            var split = hashFileLine.Split(SplitDelimiters, StringSplitOptions.None);
+            const int minimumEntryLength = 2;
+            if (split.Length < minimumEntryLength)
             {
-                ErrorMessage = $"Hash file line <{hashFileLine}> is not long enough to be valid.";
-                Error(ErrorMessage);
+                ErrorMessage = $"Hash dictionary line <{hashFileLine}> has an insufficient number of entries (found {split.Length}, need {minimumEntryLength})";
+                Warn(ErrorMessage);
                 IsValid = false;
                 return;
             }
-
-            Hash = hashFileLine.Substring(0, hash.HashLength).ToUpperInvariant();
-            RelativePath = hashFileLine.Substring(hash.HashLength + 1).Trim();
+            
+            Hash = split[HashIndex].ToUpperInvariant();
+            RelativePath = split[FilePathIndex].Trim();
             if (RelativePath.StartsWith("/") || RelativePath.StartsWith("\\"))
             {
                 RelativePath = RelativePath.Substring(1);
             }
 
-            foreach (var c in Hash)
+            if (UnknownHash.Equals(Hash, StringComparison.InvariantCultureIgnoreCase))
             {
-                if (!c.IsHex())
+                ErrorMessage = $"Hash dictionary line <{hashFileLine}> has a hash that is too short (is {Hash.Length} characters, expected {hashUtility.HashLength})";
+                // We'll treat this as a warning, but we'll continue on and just accept that we'll have to copy this file without the benefit of a hash.
+                Warn(ErrorMessage);
+            }
+            else
+            {
+                if (Hash.Length < hashUtility.HashLength)
                 {
-                    ErrorMessage = $"Hash <{Hash}> in hash dictionary for folder {RootDirectory} contains non-hex character {c}.";
+                    ErrorMessage = $"Hash dictionary line <{hashFileLine}> has an insufficient number of entries (found {split.Length}, need {minimumEntryLength})";
                     Warn(ErrorMessage);
                     IsValid = false;
                     return;
+                }
+
+                foreach (var c in Hash)
+                {
+                    if (!c.IsHex())
+                    {
+                        ErrorMessage =
+                            $"Hash <{Hash}> in hash dictionary for folder {RootDirectory} contains non-hex character {c}.";
+                        Warn(ErrorMessage);
+                        IsValid = false;
+                        return;
+                    }
                 }
             }
             Debug($"Created Hash Dictionary Entry in root directory <{RootDirectory}> with relative path" +

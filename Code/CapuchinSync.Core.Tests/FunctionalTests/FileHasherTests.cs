@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using CapuchinSync.Core.Hashes;
 using CapuchinSync.Core.Interfaces;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
@@ -47,7 +48,7 @@ namespace CapuchinSync.Core.Tests.FunctionalTests
             var hasher = new FileHasher(HashUtility, TestSourceFolder, testFile.FilePath);
             var toString = hasher.ToString();
 
-            Assert.AreEqual($"{testFile.Hash} {testFile.RelativePath}", toString, "Unexpected ToString value.");
+            Assert.AreEqual($"{testFile.Hash}{HashDictionaryEntry.Delimiter}{testFile.RelativePath}", toString, "Unexpected ToString value.");
         }
 
     }

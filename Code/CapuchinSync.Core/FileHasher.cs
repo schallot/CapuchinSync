@@ -1,4 +1,5 @@
 ﻿using System;
+using CapuchinSync.Core.Hashes;
 using CapuchinSync.Core.Interfaces;
 
 namespace CapuchinSync.Core
@@ -33,7 +34,7 @@ namespace CapuchinSync.Core
 
         public override string ToString()
         {
-            return $"{Hash} {RelativePath}";
+            return $"{Hash}{HashDictionaryEntry.Delimiter}{RelativePath}";
         }
     }
 }

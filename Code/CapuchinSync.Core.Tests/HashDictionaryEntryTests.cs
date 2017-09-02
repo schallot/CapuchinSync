@@ -20,7 +20,7 @@ namespace CapuchinSync.Core.Tests
         {
             var hash = "1234567890123456789012345678901234567890";
             var path = "somePath.txt";
-            var hashLine = $"{hash} {path}";
+            var hashLine = $"{hash}{HashDictionaryEntry.Delimiter}{path}";
             var directory = "C:\\Temp";
             var entry = new HashDictionaryEntry(_hashUtility, directory, hashLine);
             Assert.IsTrue(entry.IsValid, "Expected entry to be valid.");
@@ -37,7 +37,9 @@ namespace CapuchinSync.Core.Tests
             var directory = "C:\\Temp";
             var entry = new HashDictionaryEntry(_hashUtility, directory, hashLine);
             Assert.IsFalse(entry.IsValid, "Expected entry to be invalid.");
-            Assert.AreEqual($"Hash file line <{hashLine}> is not long enough to be valid.", entry.ErrorMessage, "Unexpected error message.");
+            
+            Assert.AreEqual($"Hash dictionary line <{hashLine}> has an insufficient number of entries (found {1}, need {2})",
+                entry.ErrorMessage, "Unexpected error message.");
         }
 
         [Test]
@@ -45,7 +47,7 @@ namespace CapuchinSync.Core.Tests
         {
             var hash = "                                        ";
             var path = "            ";
-            var hashLine = $"{hash} {path}";
+            var hashLine = $"{hash}{HashDictionaryEntry.Delimiter}{path}";
             var directory = "C:\\Temp";
             var entry = new HashDictionaryEntry(_hashUtility, directory, hashLine);
             Assert.IsFalse(entry.IsValid, "Expected entry to be invalid.");
@@ -57,7 +59,7 @@ namespace CapuchinSync.Core.Tests
         {
             var hash = "12345678901234567890123456789012345#7890";
             var path = "whatever.txt";
-            var hashLine = $"{hash} {path}";
+            var hashLine = $"{hash}{HashDictionaryEntry.Delimiter}{path}";
             var directory = "C:\\Temp";
             var entry = new HashDictionaryEntry(_hashUtility, directory, hashLine);
             Assert.IsFalse(entry.IsValid, "Expected entry to be invalid.");

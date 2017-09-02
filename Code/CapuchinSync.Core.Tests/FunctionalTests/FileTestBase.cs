@@ -142,7 +142,14 @@ namespace CapuchinSync.Core.Tests.FunctionalTests
             public string Contents { get; set; }
             public string Hash { get; set; }
             public string RootDirectory { get; set; }
-            public string HashFileLine => $"{Hash} {RelativePath}";
+
+            public string HashFileLine
+            {
+                get
+                {
+                    return $"{Hash}{HashDictionaryEntry.Delimiter}{RelativePath}";
+                }
+            }
         }
 
     }

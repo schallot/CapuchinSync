@@ -12,8 +12,8 @@ namespace CapuchinSync.Core.Tests.FunctionalTests
         {
             var dictionaryContents =
                 @"2 files
-1234567890123456789012345678901234567890 somePath.txt
-1234567890123456789012345678901234567891 subdir\somePath2.txt
+1234567890123456789012345678901234567890    somePath.txt
+1234567890123456789012345678901234567891    subdir\somePath2.txt
 ";
             CreateFile(Constants.HashFileName, dictionaryContents);
             var reader = new HashDictionaryReader(HashUtility,TestSourceFolder, FileSystem, PathUtility);
