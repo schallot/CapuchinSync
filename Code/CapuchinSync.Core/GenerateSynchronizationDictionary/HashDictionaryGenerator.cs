@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CapuchinSync.Core.Interfaces;
@@ -19,14 +20,25 @@ namespace CapuchinSync.Core.GenerateSynchronizationDictionary
             var rootDir = arguments.RootDirectory;
             var hashFile = Constants.HashFileName;
 
-            Parallel.ForEach(fileSystem.EnumerateFilesInDirectory(rootDir), file =>
+            // Because the actual enumeration of the filesystem happens at the evaluation of the
+            // return of EnumerateFilesInDirectory, we need to look for file system errors at the 
+            // enumeration, and not at the actual call of EnumerateFilesInDirectory
+            try
             {
-                FileCount++;
-                var hasher = new FileHasher(hashUtility, rootDir, file);
-                // there's no point in recording the hash of the list of hashes.
-                if (hasher.RelativePath.Equals(hashFile, StringComparison.InvariantCultureIgnoreCase)) return;
-                hashes.Add(hasher);
-            });
+                var allFiles = fileSystem.EnumerateFilesInDirectory(rootDir);
+                Parallel.ForEach(allFiles, file =>
+                {
+                    FileCount++;
+                    var hasher = new FileHasher(hashUtility, rootDir, file);
+                    // there's no point in recording the hash of the list of hashes.
+                    if (hasher.RelativePath.Equals(hashFile, StringComparison.InvariantCultureIgnoreCase)) return;
+                    hashes.Add(hasher);
+                });
+            }
+            catch (Exception e)
+            {
+                throw new Exception($"Enumeration of directory {rootDir} failed: {e.Message}", e);
+            }
 
             HashDictionaryFilepath = pathUtility.Combine(rootDir, hashFile);
             var backupLocation = HashDictionaryFilepath + ".old";

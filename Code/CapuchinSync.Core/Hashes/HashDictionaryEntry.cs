@@ -19,7 +19,7 @@ namespace CapuchinSync.Core.Hashes
         /// <summary>
         /// The string that will be used to indicate that a hash could not be computed for a file.
         /// </summary>
-        private const string UnknownHash = "?";
+        public const string UnknownHash = "?";
 
         public HashDictionaryEntry(IHashUtility hashUtility, string rootDirectory, string hashFileLine)
         {

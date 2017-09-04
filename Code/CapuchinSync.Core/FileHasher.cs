@@ -22,8 +22,8 @@ namespace CapuchinSync.Core
             }
             catch (Exception e)
             {
-                Error($"Failed to calculate hash for file {path}", e);
-                throw;
+                Warn($"Failed to calculate hash for file {path} - Defaulting to unknown hash.", e);
+                Hash = HashDictionaryEntry.UnknownHash;
             }
             Info($"Calculated hash for file {path} as {Hash}.");
         }

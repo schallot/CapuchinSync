@@ -27,7 +27,7 @@ namespace CapuchinSync.Core.Tests.FunctionalTests
         }
 
         [Test]
-        public void Constructor_FileHashOperationExceptionShouldBeThrown()
+        public void Constructor_UnknownHashShouldBeCalculatedForFileThatCouldNotBeOpened()
         {
             var testFile = TestSet1.First();
             HashUtility = Substitute.For<IHashUtility>();
@@ -36,8 +36,11 @@ namespace CapuchinSync.Core.Tests.FunctionalTests
             var exMessage = "Kablamo";
             HashUtility.GetHashFromFile("").ThrowsForAnyArgs(new Exception(exMessage));
 
-            var exception = Assert.Throws<Exception>(() => new FileHasher(HashUtility, TestSourceFolder, testFile.FilePath));
-            Assert.AreEqual(exMessage, exception.Message, "Expected exception message to be the same as that thrown by the hashing utility.");
+            var hasher = new FileHasher(HashUtility, TestSourceFolder, testFile.FilePath);
+
+            Assert.AreEqual(HashDictionaryEntry.UnknownHash, hasher.Hash, "Expected the Unknown Hash value for hour hash, since the file could not be read.");
+            Assert.IsTrue(hasher.LogEntries.Any(x=>x.Severity == LogEntry.LogSeverity.Warning), "Expected at least one warning log entry to be generated, since the file could not be read.");
+            Assert.IsTrue(hasher.LogEntries.Any(x=>x.Severity == LogEntry.LogSeverity.Warning && x.Message.Contains("Defaulting to unknown hash")), "Expected a warning about defaulting to unknown hash.");
         }
 
         [Test]
