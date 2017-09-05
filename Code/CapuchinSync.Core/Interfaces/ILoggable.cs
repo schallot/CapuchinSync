@@ -7,6 +7,7 @@ namespace CapuchinSync.Core.Interfaces
     {
         List<LogEntry> LogEntries {get;}
 
+        void Trace(string message, Exception e = null);
         void Debug(string message, Exception e = null);
         void Info(string message, Exception e = null);
         void Warn(string message, Exception e = null);

@@ -19,7 +19,7 @@ namespace CapuchinSync.Core.DirectorySynchronization
             if(fileSystem == null) throw new ArgumentNullException(nameof(fileSystem));
             if(pathUtility == null) throw new ArgumentNullException(nameof(pathUtility));
             if(fileCopierFactory == null) throw new ArgumentNullException(nameof(fileCopierFactory));
-            Debug($"Creating instance of {nameof(DirectorySyncher)} with filesystem of type {fileSystem.GetType()}");
+            Trace($"Creating instance of {nameof(DirectorySyncher)} with filesystem of type {fileSystem.GetType()}");
             _fileSystem = fileSystem;
             _pathUtility = pathUtility;
             _fileCopierFactory = fileCopierFactory;

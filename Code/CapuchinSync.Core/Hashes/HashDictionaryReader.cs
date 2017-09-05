@@ -23,8 +23,7 @@ namespace CapuchinSync.Core.Hashes
         public HashDictionaryReader(IHashUtility hash, string rootDirectory, IFileSystem fileSystem, IPathUtility pathUtility)
         {
             if(pathUtility == null) throw new ArgumentNullException(nameof(pathUtility));
-            if(hash == null) throw new ArgumentNullException(nameof(hash));
-            _hashUtility = hash;
+            _hashUtility = hash ?? throw new ArgumentNullException(nameof(hash));
             _rootDirectory = rootDirectory;
             _fileSystem = fileSystem;
             _dictionaryFile = pathUtility.Combine(rootDirectory, Constants.HashFileName);
@@ -43,8 +42,7 @@ namespace CapuchinSync.Core.Hashes
             var firstLine = hashFileContents.First();
             hashFileContents.RemoveAt(0);
             var countText = firstLine.Split(' ').FirstOrDefault(x => !string.IsNullOrWhiteSpace(x));
-            int expectedCount;
-            if (!int.TryParse(countText, out expectedCount))
+            if (!int.TryParse(countText, out var expectedCount))
             {
                 Error($"Failed to parse the file count from the first line of {_dictionaryFile}: {firstLine}.  " +
                       "The file is not properly formatted.");
@@ -58,7 +56,7 @@ namespace CapuchinSync.Core.Hashes
                 return null;
             }
 
-            var dictionary = new HashDictionary()
+            var dictionary = new HashDictionary
             {
                 FilePath = _dictionaryFile
             };

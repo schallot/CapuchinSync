@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26730.10
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CapuchinSync.Hash", "CapuchinSync.Hash\CapuchinSync.Hash.csproj", "{0964C02F-A023-4BCF-A6FC-EDACFEF5C34B}"
 EndProject
@@ -10,6 +10,11 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CapuchinSync.Core", "CapuchinSync.Core\CapuchinSync.Core.csproj", "{E776FD18-4F0E-4020-BF07-A2CFEB3B9023}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CapuchinSync.Core.Tests", "CapuchinSync.Core.Tests\CapuchinSync.Core.Tests.csproj", "{0045C663-0052-4D66-84EC-3D674D35A9CF}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{444244F1-29A7-4764-A3B6-BED360339339}"
+	ProjectSection(SolutionItems) = preProject
+		..\README.md = ..\README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -36,5 +41,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {88C696B9-FAD3-4623-9A76-771A1437DE5A}
 	EndGlobalSection
 EndGlobal

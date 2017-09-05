@@ -1,4 +1,5 @@
 ﻿using System;
+using CapuchinSync.Core.Hashes;
 using CapuchinSync.Core.Interfaces;
 
 namespace CapuchinSync.Core
@@ -8,7 +9,7 @@ namespace CapuchinSync.Core
         public FileHasher(IHashUtility hashUtility, string rootDirectory, string path)
         {
             if(hashUtility == null) throw new ArgumentNullException(nameof(hashUtility));
-            Debug($"Creating instance of {nameof(FileHasher)} with hash <{hashUtility.HashName}> for path {path} in directory {rootDirectory}.");
+            Trace($"Creating instance of {nameof(FileHasher)} with hash <{hashUtility.HashName}> for path {path} in directory {rootDirectory}.");
             RelativePath = path.Substring(rootDirectory.Length);
             if (RelativePath.StartsWith("/") || RelativePath.StartsWith("\\"))
             {
@@ -21,8 +22,8 @@ namespace CapuchinSync.Core
             }
             catch (Exception e)
             {
-                Error($"Failed to calculate hash for file {path}", e);
-                throw;
+                Warn($"Failed to calculate hash for file {path} - Defaulting to unknown hash.", e);
+                Hash = HashDictionaryEntry.UnknownHash;
             }
             Info($"Calculated hash for file {path} as {Hash}.");
         }
@@ -33,7 +34,7 @@ namespace CapuchinSync.Core
 
         public override string ToString()
         {
-            return $"{Hash} {RelativePath}";
+            return $"{Hash}{HashDictionaryEntry.Delimiter}{RelativePath}";
         }
     }
 }

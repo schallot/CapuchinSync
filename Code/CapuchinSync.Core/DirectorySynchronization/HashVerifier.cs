@@ -42,7 +42,7 @@ namespace CapuchinSync.Core.DirectorySynchronization
                 throw new ArgumentNullException(nameof(targetDirectory));
             }
             _hashUtility = hashUtility;
-            Debug($"Creating {hashUtility.HashName} {nameof(HashVerifier)} for hash dictionary entry:<{entry}> with root source directory <{entry.RootDirectory}> and root target directory <{targetDirectory}>");
+            Trace($"Creating {hashUtility.HashName} {nameof(HashVerifier)} for hash dictionary entry:<{entry}> with root source directory <{entry.RootDirectory}> and root target directory <{targetDirectory}>");
             HashEntry = entry;
             RootSourceDirectory = entry.RootDirectory;
             RootTargetDirectory = targetDirectory;
@@ -63,9 +63,16 @@ namespace CapuchinSync.Core.DirectorySynchronization
             {
                 if (_status == VerificationStatus.TargetFileNotRead)
                 {
-                    if (!_fileSystem.DoesFileExist(FullTargetPath))
+                    if (HashEntry.Hash == HashDictionaryEntry.UnknownHash)
+                    {
+                        _status = VerificationStatus.TargetFileDoesNotMatchHash;
+                        // TODO: Examine file size, last write time to determine if we really need to copy?
+                        Warn($"No hash was present for file {FullTargetPath}.  The file will be overwritten with source {FullSourcePath}.  When possible, try regenerating the hash dictionary file.");
+                    }
+                    else if (!_fileSystem.DoesFileExist(FullTargetPath))
                     {
                         _status = VerificationStatus.TargetFileDoesNotExist;
+                        Info($"File at {FullTargetPath} does not exist, so it will have to be copied from source.");
                     }
                     else
                     {
@@ -74,10 +81,12 @@ namespace CapuchinSync.Core.DirectorySynchronization
                             if (CalculatedHash == HashEntry.Hash)
                             {
                                 _status = VerificationStatus.TargetFileMatchesHash;
+                                Debug($"File at {FullTargetPath} matches source at {FullSourcePath} with hash {CalculatedHash}, so no further action is needed.");
                             }
                             else
                             {
                                 _status = VerificationStatus.TargetFileDoesNotMatchHash;
+                                Info($"File at {FullTargetPath} has hash {CalculatedHash}, which does not match {HashEntry.Hash} of source {FullSourcePath}, so it will have to be copied from source.");
                             }
                         }
                         catch (Exception e)
