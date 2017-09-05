@@ -16,6 +16,12 @@ namespace CapuchinSync.Core
         }
         
         public List<LogEntry> LogEntries { get; } = new List<LogEntry>();
+
+        public void Trace(string message, Exception e = null)
+        {
+            CreateEntry(message, LogEntry.LogSeverity.Trace, e);
+        }
+
         public void Debug(string message, Exception e = null)
         {
             CreateEntry(message, LogEntry.LogSeverity.Debug, e);
@@ -53,6 +59,9 @@ namespace CapuchinSync.Core
         {
             switch (entry.Severity)
             {
+                case LogEntry.LogSeverity.Trace:
+                    WriteToConsole($"{entry}", ConsoleColor.DarkGray, DefaultBackground);
+                    break;
                 case LogEntry.LogSeverity.Debug:
                     WriteToConsole($"{entry}", ConsoleColor.Gray, DefaultBackground);
                     break;

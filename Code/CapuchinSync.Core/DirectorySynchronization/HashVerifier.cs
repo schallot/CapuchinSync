@@ -42,7 +42,7 @@ namespace CapuchinSync.Core.DirectorySynchronization
                 throw new ArgumentNullException(nameof(targetDirectory));
             }
             _hashUtility = hashUtility;
-            Debug($"Creating {hashUtility.HashName} {nameof(HashVerifier)} for hash dictionary entry:<{entry}> with root source directory <{entry.RootDirectory}> and root target directory <{targetDirectory}>");
+            Trace($"Creating {hashUtility.HashName} {nameof(HashVerifier)} for hash dictionary entry:<{entry}> with root source directory <{entry.RootDirectory}> and root target directory <{targetDirectory}>");
             HashEntry = entry;
             RootSourceDirectory = entry.RootDirectory;
             RootTargetDirectory = targetDirectory;

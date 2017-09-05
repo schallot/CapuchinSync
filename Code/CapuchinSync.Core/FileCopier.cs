@@ -16,7 +16,7 @@ namespace CapuchinSync.Core
         {
             if(fileSystem == null) throw new ArgumentNullException(nameof(fileSystem));
             if(pathUtility == null) throw new ArgumentNullException(nameof(pathUtility));
-            Debug($"Creating instance of {typeof(FileCopier)} - source:{source}, destination:{destination}");
+            Trace($"Creating instance of {typeof(FileCopier)} - source:{source}, destination:{destination}");
             _fileSystem = fileSystem;
             _source = source;
             _destination = destination;

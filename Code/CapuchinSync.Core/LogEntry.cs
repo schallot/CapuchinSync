@@ -9,6 +9,7 @@ namespace CapuchinSync.Core
         public Type LogSourceType { get; }
         public enum LogSeverity
         {
+            Trace = -1,
             Debug = 0,
             Info,
             Warning,

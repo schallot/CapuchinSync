@@ -9,7 +9,7 @@ namespace CapuchinSync.Core
         public FileHasher(IHashUtility hashUtility, string rootDirectory, string path)
         {
             if(hashUtility == null) throw new ArgumentNullException(nameof(hashUtility));
-            Debug($"Creating instance of {nameof(FileHasher)} with hash <{hashUtility.HashName}> for path {path} in directory {rootDirectory}.");
+            Trace($"Creating instance of {nameof(FileHasher)} with hash <{hashUtility.HashName}> for path {path} in directory {rootDirectory}.");
             RelativePath = path.Substring(rootDirectory.Length);
             if (RelativePath.StartsWith("/") || RelativePath.StartsWith("\\"))
             {
