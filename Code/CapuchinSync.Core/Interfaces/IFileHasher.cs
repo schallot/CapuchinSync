@@ -3,5 +3,6 @@
     public interface IFileHasher
     {
         string RelativePath { get; }
+        string DictionaryEntryString { get; }
     }
 }

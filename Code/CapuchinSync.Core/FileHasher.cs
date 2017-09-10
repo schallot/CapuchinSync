@@ -32,9 +32,6 @@ namespace CapuchinSync.Core
 
         public string Hash { get; }
 
-        public override string ToString()
-        {
-            return $"{Hash}{HashDictionaryEntry.Delimiter}{RelativePath}";
-        }
+        public string DictionaryEntryString => $"{Hash}{HashDictionaryEntry.Delimiter}{RelativePath}";
     }
 }

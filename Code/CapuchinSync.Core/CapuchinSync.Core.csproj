@@ -41,6 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Constants.cs" />
+    <Compile Include="DateTimeProvider.cs" />
     <Compile Include="FIleCopierFactory.cs" />
     <Compile Include="FileHasherFactory.cs" />
     <Compile Include="FileSystem.cs" />
@@ -52,6 +53,7 @@
     <Compile Include="Hashes\HashDictionaryReader.cs" />
     <Compile Include="Hashes\HashDictionaryWriter.cs" />
     <Compile Include="Hashes\Sha1Hash.cs" />
+    <Compile Include="Interfaces\IDateTimeProvider.cs" />
     <Compile Include="Interfaces\IFileCopier.cs" />
     <Compile Include="Interfaces\IDirectorySynchArgument.cs" />
     <Compile Include="DirectorySynchronization\DirectorySynchCommandLineArgumentParser.cs" />

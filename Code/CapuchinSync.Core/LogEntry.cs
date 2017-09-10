@@ -6,6 +6,7 @@ namespace CapuchinSync.Core
 
     public class LogEntry : ILogEntry
     {
+        public IDateTimeProvider DateTimeProvider = new DateTimeProvider();
         public Type LogSourceType { get; }
         public enum LogSeverity
         {
@@ -19,6 +20,7 @@ namespace CapuchinSync.Core
 
         public LogEntry(Type logSourceType, LogSeverity severity, string message, Exception e = null)
         {
+            EntryDate = DateTimeProvider.Now;
             LogSourceType = logSourceType;
             Severity = severity;
             Message = message;
@@ -28,7 +30,7 @@ namespace CapuchinSync.Core
             }
         }
 
-        public DateTime EntryDate { get; } = DateTime.Now;
+        public DateTime EntryDate { get; }
         public string Message { get; }
         public LogSeverity Severity { get; }
 

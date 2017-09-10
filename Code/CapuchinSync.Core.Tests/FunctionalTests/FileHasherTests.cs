@@ -44,14 +44,13 @@ namespace CapuchinSync.Core.Tests.FunctionalTests
         }
 
         [Test]
-        public void ToString_ShouldReturnHashAndPath()
+        public void DictionaryEntryString_ShouldReturnHashAndPath()
         {
             var testFile = TestSet1.First();
             CreateFile(testFile);
             var hasher = new FileHasher(HashUtility, TestSourceFolder, testFile.FilePath);
-            var toString = hasher.ToString();
 
-            Assert.AreEqual($"{testFile.Hash}{HashDictionaryEntry.Delimiter}{testFile.RelativePath}", toString, "Unexpected ToString value.");
+            Assert.AreEqual($"{testFile.Hash}{HashDictionaryEntry.Delimiter}{testFile.RelativePath}", hasher.DictionaryEntryString);
         }
 
     }

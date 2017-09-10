@@ -9,7 +9,7 @@ namespace CapuchinSync.Core.GenerateSynchronizationDictionary
 {
     public class HashDictionaryGenerator : Loggable
     {
-        public HashDictionaryGenerator(GenerateSyncHashesArguments arguments, IFileSystem fileSystem, IPathUtility pathUtility, IFileHasherFactory hasherFactory)
+        public HashDictionaryGenerator(GenerateSyncHashesArguments arguments, IFileSystem fileSystem, IPathUtility pathUtility, IFileHasherFactory hasherFactory, IDateTimeProvider dateTimeProvider)
         {
             if(arguments == null) throw new ArgumentNullException(nameof(arguments));
 
@@ -43,10 +43,11 @@ namespace CapuchinSync.Core.GenerateSynchronizationDictionary
             HashDictionaryFilepath = pathUtility.Combine(rootDir, hashFile);
             var backupLocation = HashDictionaryFilepath + ".old";
             StringBuilder sb = new StringBuilder();
-            sb.AppendLine($"{hashes.Count} files found in {rootDir} on {DateTime.Now.ToLongDateString()} at {DateTime.Now.ToLongTimeString()}");
+            var now = dateTimeProvider.Now;
+            sb.AppendLine($"{hashes.Count} files found in {rootDir} on {dateTimeProvider.GetDateString(now)} at {dateTimeProvider.GetTimeString(now)}");
             foreach (var hash in hashes)
             {
-                sb.AppendLine(hash.ToString());
+                sb.AppendLine(hash.DictionaryEntryString);
             }
             if (fileSystem.DoesFileExist(HashDictionaryFilepath))
             {
