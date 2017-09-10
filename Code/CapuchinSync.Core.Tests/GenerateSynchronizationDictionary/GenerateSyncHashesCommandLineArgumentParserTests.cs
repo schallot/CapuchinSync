@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using CapuchinSync.Core.GenerateSynchronizationDictionary;
 using CapuchinSync.Core.Interfaces;
 using NSubstitute;
@@ -38,9 +39,93 @@ namespace CapuchinSync.Core.Tests.GenerateSynchronizationDictionary
         }
 
         [Test]
-        public void Constructor_ExtensionsToExclude()
+        public void Constructor_ExtensionsToExclude_ShouldBeEmptyWhenNoExtensionsAreSpecified()
         {
-            throw new NotImplementedException();
+            const string rootDir = "blah";
+            var parser = new GenerateSyncHashesCommandLineArgumentParser(new[] { rootDir }, _fileSystem);
+
+            Assert.IsNotNull(parser.Arguments, "Expected arguments to be non-null");
+            Assert.IsTrue(!parser.Arguments.ExtensionsToExclude.Any(), "Expected an empty collection of extensions to exclude");
+        }
+
+        [Test]
+        public void Constructor_ExtensionsToExclude_ShouldContainExtensionsSpecifiedAtCommandline()
+        {
+            const string extension1 = "pdb";
+            const string extension2 = "suo";
+            const string rootDir = "blah";
+            const string pref = GenerateSyncHashesCommandLineArgumentParser.ExcludeFilePrefix;
+            var parser = new GenerateSyncHashesCommandLineArgumentParser(new[] { rootDir, $"{pref}{extension1}", $"{pref}{extension2}" }, _fileSystem);
+
+            Assert.IsNotNull(parser.Arguments, "Expected arguments to be non-null");
+            Assert.IsNotNull(parser.Arguments.ExtensionsToExclude, $"Expected {nameof(parser.Arguments.ExtensionsToExclude)} to be non-null");
+            var extensions = parser.Arguments.ExtensionsToExclude;
+            Assert.AreEqual(2, extensions.Length, "Expected exactly two excluded extensions.");
+            var first = extensions.FirstOrDefault(x=>x.Equals(extension1, StringComparison.InvariantCultureIgnoreCase));
+            var second = extensions.FirstOrDefault(x=>x.Equals(extension2, StringComparison.InvariantCultureIgnoreCase));
+
+            Assert.IsNotNull(first,$"Expected list of excluded extensions to include first extension {extension1}.  Instead, was [{string.Join(", ", extensions)}]");
+            Assert.IsNotNull(second, $"Expected list of excluded extensions to include second {extension2}.  Instead, was [{string.Join(", ", extensions)}]");
+        }
+
+        [Test]
+        public void Constructor_ExtensionsToExclude_ShouldNotCareAboutCaseOfPrefix()
+        {
+            const string extension1 = "pdb";
+            const string extension2 = "suo";
+            const string rootDir = "blah";
+            const string pref = GenerateSyncHashesCommandLineArgumentParser.ExcludeFilePrefix;
+            var parser = new GenerateSyncHashesCommandLineArgumentParser(new[] { rootDir, $"{pref.ToUpperInvariant()}{extension1}", $"{pref.ToLowerInvariant()}{extension2}" }, _fileSystem);
+
+            Assert.IsNotNull(parser.Arguments, "Expected arguments to be non-null");
+            Assert.IsNotNull(parser.Arguments.ExtensionsToExclude, $"Expected {nameof(parser.Arguments.ExtensionsToExclude)} to be non-null");
+            var extensions = parser.Arguments.ExtensionsToExclude;
+            Assert.AreEqual(2, extensions.Length, "Expected exactly two excluded extensions.");
+            var first = extensions.FirstOrDefault(x => x.Equals(extension1, StringComparison.InvariantCultureIgnoreCase));
+            var second = extensions.FirstOrDefault(x => x.Equals(extension2, StringComparison.InvariantCultureIgnoreCase));
+
+            Assert.IsNotNull(first, $"Expected list of excluded extensions to include first extension {extension1}.  Instead, was [{string.Join(", ", extensions)}]");
+            Assert.IsNotNull(second, $"Expected list of excluded extensions to include second {extension2}.  Instead, was [{string.Join(", ", extensions)}]");
+        }
+
+        [Test]
+        public void Constructor_ExtensionsToExclude_ShouldStripOffPeriods()
+        {
+            const string extension1 = "pdb";
+            const string extension2 = "suo";
+            const string rootDir = "blah";
+            const string pref = GenerateSyncHashesCommandLineArgumentParser.ExcludeFilePrefix;
+            var parser = new GenerateSyncHashesCommandLineArgumentParser(new[] { rootDir, $"{pref.ToUpperInvariant()}.{extension1}", $"{pref.ToLowerInvariant()}.{extension2}" }, _fileSystem);
+
+            Assert.IsNotNull(parser.Arguments, "Expected arguments to be non-null");
+            Assert.IsNotNull(parser.Arguments.ExtensionsToExclude, $"Expected {nameof(parser.Arguments.ExtensionsToExclude)} to be non-null");
+            var extensions = parser.Arguments.ExtensionsToExclude;
+            Assert.AreEqual(2, extensions.Length, "Expected exactly two excluded extensions.");
+            var first = extensions.FirstOrDefault(x => x.Equals(extension1, StringComparison.InvariantCultureIgnoreCase));
+            var second = extensions.FirstOrDefault(x => x.Equals(extension2, StringComparison.InvariantCultureIgnoreCase));
+
+            Assert.IsNotNull(first, $"Expected list of excluded extensions to include first extension {extension1}.  Instead, was [{string.Join(", ", extensions)}]");
+            Assert.IsNotNull(second, $"Expected list of excluded extensions to include second {extension2}.  Instead, was [{string.Join(", ", extensions)}]");
+        }
+
+        [Test]
+        public void Constructor_ExtensionsToExclude_ShouldStripOffStars()
+        {
+            const string extension1 = "pdb";
+            const string extension2 = "suo";
+            const string rootDir = "blah";
+            const string pref = GenerateSyncHashesCommandLineArgumentParser.ExcludeFilePrefix;
+            var parser = new GenerateSyncHashesCommandLineArgumentParser(new[] { rootDir, $"{pref.ToUpperInvariant()}*{extension1}", $"{pref.ToLowerInvariant()}*{extension2}" }, _fileSystem);
+
+            Assert.IsNotNull(parser.Arguments, "Expected arguments to be non-null");
+            Assert.IsNotNull(parser.Arguments.ExtensionsToExclude, $"Expected {nameof(parser.Arguments.ExtensionsToExclude)} to be non-null");
+            var extensions = parser.Arguments.ExtensionsToExclude;
+            Assert.AreEqual(2, extensions.Length, "Expected exactly two excluded extensions.");
+            var first = extensions.FirstOrDefault(x => x.Equals(extension1, StringComparison.InvariantCultureIgnoreCase));
+            var second = extensions.FirstOrDefault(x => x.Equals(extension2, StringComparison.InvariantCultureIgnoreCase));
+
+            Assert.IsNotNull(first, $"Expected list of excluded extensions to include first extension {extension1}.  Instead, was [{string.Join(", ", extensions)}]");
+            Assert.IsNotNull(second, $"Expected list of excluded extensions to include second {extension2}.  Instead, was [{string.Join(", ", extensions)}]");
         }
     }
 }

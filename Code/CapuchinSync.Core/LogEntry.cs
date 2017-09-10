@@ -36,7 +36,7 @@ namespace CapuchinSync.Core
 
         public override string ToString()
         {
-            return $"{Severity.ToString().ToUpperInvariant()}: {EntryDate.ToShortDateString()}@{EntryDate.ToShortTimeString()}, {LogSourceType.Name}: {Message}";
+            return $"{Severity.ToString().ToUpperInvariant()}: {EntryDate.ToShortDateString()}@{EntryDate.ToLongTimeString()}, {LogSourceType.Name}: {Message}";
         }
     }
 }

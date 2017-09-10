@@ -15,13 +15,13 @@ namespace CapuchinSync.Core.GenerateSynchronizationDictionary
         }
 
         public int ErrorNumber { get; }
+        public const string ExcludeFilePrefix = "XF:";
 
         public GenerateSyncHashesCommandLineArgumentParser(string[] commandLineArgs, IFileSystem fileSystem)
         {
-            const string excludeFilePrefix = "XF:";
             string exampleArguments = "Arguments should be supplied in the form of" +
-                                            $"\r\n\t<Directory> [{excludeFilePrefix}<FileExcludePattern> ...]" +
-                                            $"\r\n\tFor example, <C:\\Directory1 {excludeFilePrefix}*.pdb {excludeFilePrefix}*.suo>.";           
+                                            $"\r\n\t<Directory> [{ExcludeFilePrefix}<FileExcludePattern> ...]" +
+                                            $"\r\n\tFor example, <C:\\Directory1 {ExcludeFilePrefix}*.pdb {ExcludeFilePrefix}*.suo>.";           
 
             var args = new List<string>();
             if (commandLineArgs != null) {
@@ -47,13 +47,13 @@ namespace CapuchinSync.Core.GenerateSynchronizationDictionary
             
             args.RemoveAt(0);
 
-            var excludeArgs = args.Where(x => x.StartsWith(excludeFilePrefix, StringComparison.InvariantCultureIgnoreCase))
-                .Select(x=>x.Substring(excludeFilePrefix.Length)
+            var excludeArgs = args.Where(x => x.StartsWith(ExcludeFilePrefix, StringComparison.InvariantCultureIgnoreCase))
+                .Select(x=>x.Substring(ExcludeFilePrefix.Length)
                     .Trim()
                     .Trim('.','*') // We'll get rid of any *'s or .'s in the extensions to normalize things.
                     .Trim())
                 .ToArray();
-            args = args.Where(x => !x.StartsWith(excludeFilePrefix, StringComparison.InvariantCultureIgnoreCase)).ToList();
+            args = args.Where(x => !x.StartsWith(ExcludeFilePrefix, StringComparison.InvariantCultureIgnoreCase)).ToList();
 
             if (args.Any())
             {
