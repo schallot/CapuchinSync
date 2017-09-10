@@ -56,6 +56,7 @@
     <Compile Include="FunctionalTests\FileTestBase.cs" />
     <Compile Include="FunctionalTests\HashDictionaryReaderTests.cs" />
     <Compile Include="FunctionalTests\HashVerifierTests.cs" />
+    <Compile Include="GenerateSynchronizationDictionary\GenerateSyncHashesCommandLineArgumentParserTests.cs" />
     <Compile Include="GenerateSynchronizationDictionary\HashDictionaryGeneratorTests.cs" />
     <Compile Include="HashDictionaryEntryTests.cs" />
     <Compile Include="LoggableTests.cs" />
