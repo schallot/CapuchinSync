@@ -48,7 +48,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DateTimeProviderTests.cs" />
     <Compile Include="DirectorySynchCommandLineArgumentParserTests.cs" />
+    <Compile Include="ExtensionsTests.cs" />
+    <Compile Include="FileHasherFactoryTests.cs" />
     <Compile Include="FunctionalTests\DirectorySyncherTests.cs" />
     <Compile Include="FunctionalTests\FileCopierTests.cs" />
     <Compile Include="FunctionalTests\FileSystemTests.cs" />
@@ -60,6 +63,7 @@
     <Compile Include="GenerateSynchronizationDictionary\HashDictionaryGeneratorTests.cs" />
     <Compile Include="HashDictionaryEntryTests.cs" />
     <Compile Include="LoggableTests.cs" />
+    <Compile Include="PathUtilityTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
