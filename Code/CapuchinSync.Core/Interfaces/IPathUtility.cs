@@ -23,5 +23,12 @@
         /// </summary>
         /// <returns></returns>
         string GetTempFileName();
+
+        /// <summary>
+        /// Returns the file name and extension of the specified path.
+        /// </summary>
+        /// <param name="path">The path.</param>
+        /// <returns></returns>
+        string GetFileName(string path);
     }
 }

@@ -19,5 +19,10 @@ namespace CapuchinSync.Core
         {
             return Path.GetTempFileName();
         }
+
+        public string GetFileName(string path)
+        {
+            return Path.GetFileName(path);
+        }
     }
 }

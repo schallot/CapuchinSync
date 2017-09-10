@@ -28,16 +28,16 @@ namespace CapuchinSync.Core.GenerateSynchronizationDictionary
                 Parallel.ForEach(allFiles, file =>
                 {
                     FileCount++;
-                    //var hasher = new FileHasher(hashUtility, rootDir, file);
-                    var hasher = hasherFactory.CreateHasher(file);
                     // there's no point in recording the hash of the list of hashes.
-                    if (hasher.RelativePath.Equals(hashFile, StringComparison.InvariantCultureIgnoreCase)) return;
+                    if (file.EndsWith(hashFile, StringComparison.CurrentCultureIgnoreCase) && hashFile.Equals(pathUtility.GetFileName(file),
+                        StringComparison.InvariantCultureIgnoreCase)) return;
+                    var hasher = hasherFactory.CreateHasher(file);
                     hashes.Add(hasher);
                 });
             }
             catch (Exception e)
             {
-                throw new Exception($"Enumeration of directory {rootDir} failed: {e.Message}", e);
+                throw new Exception($"Enumeration of directory {rootDir} failed: {e.InnerException?.Message}", e);
             }
 
             HashDictionaryFilepath = pathUtility.Combine(rootDir, hashFile);
@@ -49,16 +49,18 @@ namespace CapuchinSync.Core.GenerateSynchronizationDictionary
             {
                 sb.AppendLine(hash.DictionaryEntryString);
             }
+            // If an old backup file exists, go ahead and delete it.
+            if (fileSystem.DoesFileExist(backupLocation))
+            {
+                fileSystem.DeleteFile(backupLocation);
+            }
+            // Now, if an old dictionary exists, move it to the backup location
             if (fileSystem.DoesFileExist(HashDictionaryFilepath))
             {
                 fileSystem.MoveFile(HashDictionaryFilepath, backupLocation);
             }
             fileSystem.WriteAsUtf8TextFile(HashDictionaryFilepath, sb.ToString());
-            if (fileSystem.DoesFileExist(backupLocation))
-            {
-                fileSystem.DeleteFile(backupLocation);
-            }
-
+            
             Info($"Hashes written to {HashDictionaryFilepath}");
 
             watch.Stop();
