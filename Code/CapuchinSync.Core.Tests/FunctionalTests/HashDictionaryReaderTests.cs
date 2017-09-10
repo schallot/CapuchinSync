@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Linq;
 using CapuchinSync.Core.Hashes;
 using NUnit.Framework;
@@ -133,6 +134,15 @@ namespace CapuchinSync.Core.Tests.FunctionalTests
             var reader = new HashDictionaryReader(HashUtility, TestSourceFolder, FileSystem, PathUtility);
             reader.Read();
             Assert.AreEqual(HashDictionaryReader.ErrorCodes.HashDictionaryNotFound, reader.ErrorCode, "Unexpected error code.");
+        }
+
+        [Test]
+        public void ReadHashDictionary_ShouldThrowArgumentNullExceptionForNullPathUtility()
+        {
+            Assert.Throws<ArgumentNullException>(() =>
+            {
+                var reader = new HashDictionaryReader(HashUtility, TestSourceFolder, FileSystem, null);
+            });
         }
     }
 }
