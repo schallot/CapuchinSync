@@ -15,17 +15,15 @@ namespace CapuchinSync.Core.Hashes
         }
 
         private readonly string _dictionaryFile;
-        private readonly string _rootDirectory;
         private readonly IFileSystem _fileSystem;
-        private readonly IHashUtility _hashUtility;
         public int ErrorCode;
+        private readonly IHashDictionaryFactory _hashEntryFactory;
 
-        public HashDictionaryReader(IHashUtility hash, string rootDirectory, IFileSystem fileSystem, IPathUtility pathUtility)
+        public HashDictionaryReader(string rootDirectory, IFileSystem fileSystem, IPathUtility pathUtility, IHashDictionaryFactory hashEntryFactory)
         {
             if(pathUtility == null) throw new ArgumentNullException(nameof(pathUtility));
-            _hashUtility = hash ?? throw new ArgumentNullException(nameof(hash));
-            _rootDirectory = rootDirectory;
             _fileSystem = fileSystem;
+            _hashEntryFactory = hashEntryFactory ?? throw new ArgumentNullException(nameof(hashEntryFactory));
             _dictionaryFile = pathUtility.Combine(rootDirectory, Constants.HashFileName);
             Info($"Creating hash dictionary reader for file {Constants.HashFileName} in directory {rootDirectory}");
         }
@@ -61,7 +59,7 @@ namespace CapuchinSync.Core.Hashes
                 FilePath = _dictionaryFile
             };
 
-            dictionary.Entries.AddRange(hashFileContents.Select(x => new HashDictionaryEntry(_hashUtility,_rootDirectory,x)));
+            dictionary.Entries.AddRange(hashFileContents.Select(x => _hashEntryFactory.CreateHashEntry(x)));
             var firstInvalidLine = dictionary.Entries.FirstOrDefault(x => !x.IsValid);
             if (firstInvalidLine != null)
             {

@@ -16,6 +16,7 @@ namespace CapuchinSync.Core.Tests.FunctionalTests
         protected IPathUtility PathUtility { get; set; }
         protected IHashUtility HashUtility { get; set; }
         protected IFileCopierFactory FileCopierFactory { get; set; }
+        protected IHashDictionaryFactory HashDictionaryFactory { get; set; }
 
         [SetUp]
         public void BaseSetup()
@@ -24,6 +25,7 @@ namespace CapuchinSync.Core.Tests.FunctionalTests
             PathUtility = new PathUtility();
             HashUtility = new Sha1Hash();
             FileCopierFactory = new FileCopierFactory();
+            HashDictionaryFactory = new HashDictionaryFactory(HashUtility, TestSourceFolder);
             var tempDir = Path.GetTempPath();
             var rootTestDir = Path.Combine(tempDir, "DirectoryHashSyncTests");
             if (!Directory.Exists(rootTestDir))

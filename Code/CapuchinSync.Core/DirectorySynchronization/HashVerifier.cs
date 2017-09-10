@@ -11,7 +11,7 @@ namespace CapuchinSync.Core.DirectorySynchronization
         private string _calculatedHash;
         private readonly IFileSystem _fileSystem;
         private readonly IHashUtility _hashUtility;
-        public HashDictionaryEntry HashEntry { get; }
+        public IHashDictionaryEntry HashEntry { get; }
 
         public enum VerificationStatus
         {
@@ -21,7 +21,7 @@ namespace CapuchinSync.Core.DirectorySynchronization
             TargetFileNotRead
         }
 
-        public HashVerifier(HashDictionaryEntry entry, string targetDirectory, 
+        public HashVerifier(IHashDictionaryEntry entry, string targetDirectory, 
             IFileSystem fileSystem, IPathUtility pathUtility,
             IHashUtility hashUtility)
         {
@@ -33,15 +33,11 @@ namespace CapuchinSync.Core.DirectorySynchronization
             {
                 throw new ArgumentNullException(nameof(pathUtility));
             }
-            if (hashUtility == null)
-            {
-                throw new ArgumentNullException(nameof(hashUtility));
-            }
             if (string.IsNullOrWhiteSpace(targetDirectory))
             {
                 throw new ArgumentNullException(nameof(targetDirectory));
             }
-            _hashUtility = hashUtility;
+            _hashUtility = hashUtility ?? throw new ArgumentNullException(nameof(hashUtility));
             Trace($"Creating {hashUtility.HashName} {nameof(HashVerifier)} for hash dictionary entry:<{entry}> with root source directory <{entry.RootDirectory}> and root target directory <{targetDirectory}>");
             HashEntry = entry;
             RootSourceDirectory = entry.RootDirectory;
@@ -49,12 +45,6 @@ namespace CapuchinSync.Core.DirectorySynchronization
             _fileSystem = fileSystem;
             FullSourcePath = pathUtility.Combine(RootSourceDirectory, HashEntry.RelativePath);
             FullTargetPath = pathUtility.Combine(RootTargetDirectory, HashEntry.RelativePath);
-        }
-
-        public void RecalculateFileMatch()
-        {
-            Debug($"Allowing for recalculation of local file based on hash file line <{HashEntry}>");
-            _status = VerificationStatus.TargetFileNotRead;
         }
 
         public VerificationStatus Status 

@@ -50,6 +50,7 @@
   <ItemGroup>
     <Compile Include="DateTimeProviderTests.cs" />
     <Compile Include="DirectorySynchCommandLineArgumentParserTests.cs" />
+    <Compile Include="DirectorySynchronization\HashVerifierTests.cs" />
     <Compile Include="ExtensionsTests.cs" />
     <Compile Include="FileHasherFactoryTests.cs" />
     <Compile Include="FunctionalTests\DirectorySyncherTests.cs" />

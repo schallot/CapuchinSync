@@ -3,7 +3,7 @@ using CapuchinSync.Core.Interfaces;
 
 namespace CapuchinSync.Core.Hashes
 {
-    public class HashDictionaryEntry : Loggable
+    public class HashDictionaryEntry : Loggable, IHashDictionaryEntry
     {
         public string ErrorMessage { get; }
         /// <summary>

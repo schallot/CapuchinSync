@@ -17,7 +17,7 @@ namespace CapuchinSync.Core.Tests.FunctionalTests
 1234567890123456789012345678901234567891{delimiter}subdir\somePath2.txt
 ".Replace("{delimiter}", HashDictionaryEntry.Delimiter);
             CreateFile(Constants.HashFileName, dictionaryContents);
-            var reader = new HashDictionaryReader(HashUtility,TestSourceFolder, FileSystem, PathUtility);
+            var reader = new HashDictionaryReader(TestSourceFolder, FileSystem, PathUtility, HashDictionaryFactory);
             var hashDictionary = reader.Read();
             Assert.AreEqual(0, reader.ErrorCode, "Unexpected error code.");
             Assert.AreEqual(Path.Combine(TestSourceFolder,Constants.HashFileName), hashDictionary.FilePath, "Unexpected file path.");
@@ -50,7 +50,7 @@ namespace CapuchinSync.Core.Tests.FunctionalTests
 1234567890123456789012345678901234557890{delimiter}/somePath.txt
 ".Replace("{delimiter}", HashDictionaryEntry.Delimiter);
             CreateFile(Constants.HashFileName, dictionaryContents);
-            var reader = new HashDictionaryReader(HashUtility, TestSourceFolder, FileSystem, PathUtility);
+            var reader = new HashDictionaryReader(TestSourceFolder, FileSystem, PathUtility, HashDictionaryFactory);
             var dictionary = reader.Read();
             Assert.AreEqual(0, reader.ErrorCode, "Unexpected error code.");
             Assert.AreEqual("somePath.txt", dictionary.Entries.Single().RelativePath, "Unexpected relative path.");
@@ -66,7 +66,7 @@ namespace CapuchinSync.Core.Tests.FunctionalTests
 
 ".Replace("{delimiter}", HashDictionaryEntry.Delimiter);
             CreateFile(Constants.HashFileName, dictionaryContents);
-            var reader = new HashDictionaryReader(HashUtility, TestSourceFolder, FileSystem, PathUtility);
+            var reader = new HashDictionaryReader(TestSourceFolder, FileSystem, PathUtility, HashDictionaryFactory);
             var dictionary = reader.Read();
             Assert.AreEqual(0, reader.ErrorCode, "Unexpected error code.");
             Assert.AreEqual(1, dictionary.Entries.Count, "Unexpected number of entries read.");
@@ -81,7 +81,7 @@ namespace CapuchinSync.Core.Tests.FunctionalTests
 12345678901234567890123456789012345Z7890{delimiter}somePath.txt
 ".Replace("{delimiter}", HashDictionaryEntry.Delimiter);
             CreateFile(Constants.HashFileName, dictionaryContents);
-            var reader = new HashDictionaryReader(HashUtility, TestSourceFolder, FileSystem, PathUtility);
+            var reader = new HashDictionaryReader(TestSourceFolder, FileSystem, PathUtility, HashDictionaryFactory);
             reader.Read();
             Assert.AreEqual(HashDictionaryReader.ErrorCodes.InvalidHashDictionaryLine, reader.ErrorCode, "Unexpected error code.");
         }
@@ -94,7 +94,7 @@ namespace CapuchinSync.Core.Tests.FunctionalTests
 12345678901234567890123456789012345Z7890{delimiter}somePath.txt
 ".Replace("{delimiter}", HashDictionaryEntry.Delimiter);
             CreateFile(Constants.HashFileName, dictionaryContents);
-            var reader = new HashDictionaryReader(HashUtility, TestSourceFolder, FileSystem, PathUtility);
+            var reader = new HashDictionaryReader(TestSourceFolder, FileSystem, PathUtility, HashDictionaryFactory);
             reader.Read();
             Assert.AreEqual(HashDictionaryReader.ErrorCodes.CouldNotReadFileCountFromFirstLine, reader.ErrorCode, "Unexpected error code.");
         }
@@ -107,7 +107,7 @@ namespace CapuchinSync.Core.Tests.FunctionalTests
 1234567890123456789012345678901234537890{delimiter}somePath.txt
 ".Replace("{delimiter}", HashDictionaryEntry.Delimiter);
             CreateFile(Constants.HashFileName, dictionaryContents);
-            var reader = new HashDictionaryReader(HashUtility, TestSourceFolder, FileSystem, PathUtility);
+            var reader = new HashDictionaryReader(TestSourceFolder, FileSystem, PathUtility, HashDictionaryFactory);
             reader.Read();
             Assert.AreEqual(HashDictionaryReader.ErrorCodes.UnexpectedNumberOfHashesInFile, reader.ErrorCode, "Unexpected error code.");
         }
@@ -121,7 +121,7 @@ namespace CapuchinSync.Core.Tests.FunctionalTests
 3838383838 invalid line
 ";
             CreateFile(Constants.HashFileName, dictionaryContents);
-            var reader = new HashDictionaryReader(HashUtility, TestSourceFolder, FileSystem, PathUtility);
+            var reader = new HashDictionaryReader(TestSourceFolder, FileSystem, PathUtility, HashDictionaryFactory);
             reader.Read();
             Assert.AreEqual(HashDictionaryReader.ErrorCodes.InvalidHashDictionaryLine, reader.ErrorCode, "Unexpected error code.");
         }
@@ -131,7 +131,7 @@ namespace CapuchinSync.Core.Tests.FunctionalTests
         public void ReadHashDictionary_ShouldGiveHashDictionaryNotFoundError()
         {
             // We won't bother creating the hash file
-            var reader = new HashDictionaryReader(HashUtility, TestSourceFolder, FileSystem, PathUtility);
+            var reader = new HashDictionaryReader(TestSourceFolder, FileSystem, PathUtility, HashDictionaryFactory);
             reader.Read();
             Assert.AreEqual(HashDictionaryReader.ErrorCodes.HashDictionaryNotFound, reader.ErrorCode, "Unexpected error code.");
         }
@@ -141,7 +141,7 @@ namespace CapuchinSync.Core.Tests.FunctionalTests
         {
             Assert.Throws<ArgumentNullException>(() =>
             {
-                var reader = new HashDictionaryReader(HashUtility, TestSourceFolder, FileSystem, null);
+                var reader = new HashDictionaryReader(TestSourceFolder, FileSystem, null, HashDictionaryFactory);
             });
         }
     }
