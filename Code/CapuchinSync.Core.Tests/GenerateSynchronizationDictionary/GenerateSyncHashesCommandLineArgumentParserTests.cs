@@ -127,5 +127,29 @@ namespace CapuchinSync.Core.Tests.GenerateSynchronizationDictionary
             Assert.IsNotNull(first, $"Expected list of excluded extensions to include first extension {extension1}.  Instead, was [{string.Join(", ", extensions)}]");
             Assert.IsNotNull(second, $"Expected list of excluded extensions to include second {extension2}.  Instead, was [{string.Join(", ", extensions)}]");
         }
+
+        [Test]
+        public void Constructor_ShouldTriggerNoArgumentsProvidedErrorCode()
+        {
+            var parser = new GenerateSyncHashesCommandLineArgumentParser(new string[] { }, _fileSystem);
+            Assert.AreEqual(GenerateSyncHashesCommandLineArgumentParser.ErrorCodes.NoArgumentsProvided, parser.ErrorNumber);
+        }
+
+        [Test]
+        public void Constructor_ShouldTriggerDirectoryDoesNotExistErrorCode()
+        {
+            _fileSystem = Substitute.For<IFileSystem>();
+            _fileSystem.DoesDirectoryExist(Arg.Any<string>()).Returns(false);
+            var parser = new GenerateSyncHashesCommandLineArgumentParser(new [] { "thisIsTheDirectoryArgumentAndShouldBeFine" }, _fileSystem);
+            Assert.AreEqual(GenerateSyncHashesCommandLineArgumentParser.ErrorCodes.DirectoryDoesNotExist, parser.ErrorNumber);
+        }
+
+        [Test]
+        public void Constructor_ShouldTriggerUnrecognizedArgumentErrorCode()
+        {
+            var parser = new GenerateSyncHashesCommandLineArgumentParser(new [] { "thisIsTheDirectoryArgumentAndShouldBeFine", "invalidPrefix:whatever"}, _fileSystem);
+            Assert.AreEqual(GenerateSyncHashesCommandLineArgumentParser.ErrorCodes.UnrecognizedArgument, parser.ErrorNumber);
+        }
+
     }
 }
