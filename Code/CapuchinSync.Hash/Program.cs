@@ -26,8 +26,9 @@ namespace CapuchinSync.Hash
             var pathUtility = new PathUtility();
             try
             {
+                var hasherFactory = new FileHasherFactory(hashUtility, parser.Arguments.RootDirectory);
                 var hasherDictionaryGenerator =
-                    new HashDictionaryGenerator(parser.Arguments, fileSystem, hashUtility, pathUtility);
+                    new HashDictionaryGenerator(parser.Arguments, fileSystem, pathUtility, hasherFactory);
                 Info($"Finished generating {hasherDictionaryGenerator.HashDictionaryFilepath}");
             }
             catch (Exception e)

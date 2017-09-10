@@ -4,7 +4,7 @@ using CapuchinSync.Core.Interfaces;
 
 namespace CapuchinSync.Core
 {
-    public class FileHasher : Loggable
+    public class FileHasher : Loggable, IFileHasher
     {
         public FileHasher(IHashUtility hashUtility, string rootDirectory, string path)
         {

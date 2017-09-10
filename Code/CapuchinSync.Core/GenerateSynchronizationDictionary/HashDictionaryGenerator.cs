@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CapuchinSync.Core.Interfaces;
@@ -10,11 +9,11 @@ namespace CapuchinSync.Core.GenerateSynchronizationDictionary
 {
     public class HashDictionaryGenerator : Loggable
     {
-        public HashDictionaryGenerator(GenerateSyncHashesArguments arguments, IFileSystem fileSystem, IHashUtility hashUtility, IPathUtility pathUtility)
+        public HashDictionaryGenerator(GenerateSyncHashesArguments arguments, IFileSystem fileSystem, IPathUtility pathUtility, IFileHasherFactory hasherFactory)
         {
             if(arguments == null) throw new ArgumentNullException(nameof(arguments));
 
-            var hashes = new List<FileHasher>();
+            var hashes = new List<IFileHasher>();
             Stopwatch watch = new Stopwatch();
             watch.Restart();
             var rootDir = arguments.RootDirectory;
@@ -29,7 +28,8 @@ namespace CapuchinSync.Core.GenerateSynchronizationDictionary
                 Parallel.ForEach(allFiles, file =>
                 {
                     FileCount++;
-                    var hasher = new FileHasher(hashUtility, rootDir, file);
+                    //var hasher = new FileHasher(hashUtility, rootDir, file);
+                    var hasher = hasherFactory.CreateHasher(file);
                     // there's no point in recording the hash of the list of hashes.
                     if (hasher.RelativePath.Equals(hashFile, StringComparison.InvariantCultureIgnoreCase)) return;
                     hashes.Add(hasher);

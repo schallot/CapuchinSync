@@ -42,6 +42,7 @@
   <ItemGroup>
     <Compile Include="Constants.cs" />
     <Compile Include="FIleCopierFactory.cs" />
+    <Compile Include="FileHasherFactory.cs" />
     <Compile Include="FileSystem.cs" />
     <Compile Include="GenerateSynchronizationDictionary\GenerateSyncHashesArguments.cs" />
     <Compile Include="GenerateSynchronizationDictionary\GenerateSyncHashesCommandLineArgumentParser.cs" />
@@ -60,6 +61,8 @@
     <Compile Include="FileHasher.cs" />
     <Compile Include="DirectorySynchronization\HashVerifier.cs" />
     <Compile Include="Interfaces\IFileCopierFactory.cs" />
+    <Compile Include="Interfaces\IFileHasher.cs" />
+    <Compile Include="Interfaces\IFileHasherFactory.cs" />
     <Compile Include="Interfaces\IFileSystem.cs" />
     <Compile Include="Interfaces\IHashUtility.cs" />
     <Compile Include="Interfaces\ILogEntry.cs" />
