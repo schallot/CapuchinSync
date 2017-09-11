@@ -10,22 +10,21 @@ namespace CapuchinSync.Core.DirectorySynchronization
         private int _filesExamined = 0;
         private int _failedReads;
         public bool OpenLogInNotepad = false;
-        private readonly IFileSystem _fileSystem;
         private readonly IPathUtility _pathUtility;
         private readonly IFileCopierFactory _fileCopierFactory;
 
-        public DirectorySyncher(IFileSystem fileSystem, IPathUtility pathUtility, IFileCopierFactory fileCopierFactory)
+        public DirectorySyncher(IFileSystem fileSystem, IPathUtility pathUtility, IFileCopierFactory fileCopierFactory) 
+            : base(fileSystem)
         {
             if(fileSystem == null) throw new ArgumentNullException(nameof(fileSystem));
             if(pathUtility == null) throw new ArgumentNullException(nameof(pathUtility));
             if(fileCopierFactory == null) throw new ArgumentNullException(nameof(fileCopierFactory));
             Trace($"Creating instance of {nameof(DirectorySyncher)} with filesystem of type {fileSystem.GetType()}");
-            _fileSystem = fileSystem;
             _pathUtility = pathUtility;
             _fileCopierFactory = fileCopierFactory;
         }
 
-        public int Synchronize(List<HashVerifier> hashesToVerify)
+        public int Synchronize(IEnumerable<IHashVerifier> hashesToVerify)
         {
             var groups = hashesToVerify
                 .GroupBy(x => x.HashEntry.Hash).Select(x => x.ToArray()).ToArray();
@@ -45,8 +44,7 @@ namespace CapuchinSync.Core.DirectorySynchronization
                     var firstMisMatch = misMatches.First();
                     misMatches.RemoveAt(0);
                     Info($"Updating {firstMisMatch.FullTargetPath} from {firstMisMatch.FullSourcePath}.");
-                    var copier = _fileCopierFactory.CreateFileCopier(_fileSystem, _pathUtility, 
-                        firstMisMatch.FullSourcePath, firstMisMatch.FullTargetPath);
+                    var copier = _fileCopierFactory.CreateFileCopier(firstMisMatch.FullSourcePath, firstMisMatch.FullTargetPath);
                     copier.PerformCopy();
                     matchingHashes.Add(firstMisMatch);
                     copies++;
@@ -56,8 +54,7 @@ namespace CapuchinSync.Core.DirectorySynchronization
                 foreach (var mismatch in misMatches)
                 {
                     Info($"Updating {mismatch.FullTargetPath} from local {firstMatch.FullTargetPath}.");
-                    var copier = _fileCopierFactory.CreateFileCopier(_fileSystem, _pathUtility, 
-                        firstMatch.FullTargetPath, mismatch.FullTargetPath);
+                    var copier = _fileCopierFactory.CreateFileCopier(firstMatch.FullTargetPath, mismatch.FullTargetPath);
                     copier.PerformCopy();
                     copies++;
                 }

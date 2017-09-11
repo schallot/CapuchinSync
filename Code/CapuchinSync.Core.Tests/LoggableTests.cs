@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using CapuchinSync.Core.Interfaces;
 using NUnit.Framework;
 
 namespace CapuchinSync.Core.Tests
@@ -161,5 +162,8 @@ namespace CapuchinSync.Core.Tests
         //    Assert.IsTrue(Math.Abs(differenceInTimeInSeconds) < 5, $"Expected datetime of {now}, but found {match.EntryDate}, wich differs by {differenceInTimeInSeconds} seconds.");
         //}
 
+        public LoggableTests() : base(new FileSystem())
+        {
+        }
     }
 }

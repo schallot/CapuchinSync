@@ -18,6 +18,7 @@ namespace CapuchinSync.Core.GenerateSynchronizationDictionary
         public const string ExcludeFilePrefix = "XF:";
 
         public GenerateSyncHashesCommandLineArgumentParser(string[] commandLineArgs, IFileSystem fileSystem)
+            : base(fileSystem)
         {
             string exampleArguments = "Arguments should be supplied in the form of" +
                                             $"\r\n\t<Directory> [{ExcludeFilePrefix}<FileExcludePattern> ...]" +

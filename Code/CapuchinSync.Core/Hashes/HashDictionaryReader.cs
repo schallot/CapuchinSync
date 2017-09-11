@@ -15,14 +15,13 @@ namespace CapuchinSync.Core.Hashes
         }
 
         private readonly string _dictionaryFile;
-        private readonly IFileSystem _fileSystem;
         public int ErrorCode;
         private readonly IHashDictionaryFactory _hashEntryFactory;
 
-        public HashDictionaryReader(string rootDirectory, IFileSystem fileSystem, IPathUtility pathUtility, IHashDictionaryFactory hashEntryFactory)
+        public HashDictionaryReader(string rootDirectory, IFileSystem fileSystem, IPathUtility pathUtility, IHashDictionaryFactory hashEntryFactory) 
+            : base(fileSystem)
         {
             if(pathUtility == null) throw new ArgumentNullException(nameof(pathUtility));
-            _fileSystem = fileSystem;
             _hashEntryFactory = hashEntryFactory ?? throw new ArgumentNullException(nameof(hashEntryFactory));
             _dictionaryFile = pathUtility.Combine(rootDirectory, Constants.HashFileName);
             Info($"Creating hash dictionary reader for file {Constants.HashFileName} in directory {rootDirectory}");
@@ -30,13 +29,13 @@ namespace CapuchinSync.Core.Hashes
 
         public HashDictionary Read()
         {
-            if (!_fileSystem.DoesFileExist(_dictionaryFile))
+            if (!FileSystem.DoesFileExist(_dictionaryFile))
             {
                 Error($"No hash file exists at {_dictionaryFile}.");
                 ErrorCode = ErrorCodes.HashDictionaryNotFound;
                 return null;
             }
-            var hashFileContents = _fileSystem.ReadAllLines(_dictionaryFile).Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
+            var hashFileContents = FileSystem.ReadAllLines(_dictionaryFile).Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
             var firstLine = hashFileContents.First();
             hashFileContents.RemoveAt(0);
             var countText = firstLine.Split(' ').FirstOrDefault(x => !string.IsNullOrWhiteSpace(x));

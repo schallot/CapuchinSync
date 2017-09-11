@@ -6,16 +6,18 @@ namespace CapuchinSync.Core
     {
         private readonly IHashUtility _hashUtility;
         private readonly string _rootDir;
+        private readonly IFileSystem _fileSystem;
 
-        public FileHasherFactory(IHashUtility hashUtility, string rootDir)
+        public FileHasherFactory(IFileSystem fileSystem, IHashUtility hashUtility, string rootDir)
         {
             _hashUtility = hashUtility;
             _rootDir = rootDir;
+            _fileSystem = fileSystem;
         }
 
         public IFileHasher CreateHasher(string filePath)
         {
-            return new FileHasher(_hashUtility, _rootDir, filePath);
+            return new FileHasher(_fileSystem, _hashUtility, _rootDir, filePath);
         }
     }
 }

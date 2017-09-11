@@ -7,16 +7,18 @@ namespace CapuchinSync.Core
     {
         private readonly IHashUtility _hashUtility;
         private readonly string _rootDirectory;
+        private readonly IFileSystem _fileSystem;
 
-        public HashDictionaryFactory(IHashUtility hashUtility, string rootDirectory)
+        public HashDictionaryFactory(IFileSystem fileSystem, IHashUtility hashUtility, string rootDirectory)
         {
             _hashUtility = hashUtility;
             _rootDirectory = rootDirectory;
+            _fileSystem = fileSystem;
         }
 
         public IHashDictionaryEntry CreateHashEntry(string filePath)
         {
-            return new HashDictionaryEntry(_hashUtility, _rootDirectory, filePath);
+            return new HashDictionaryEntry(_fileSystem, _hashUtility, _rootDirectory, filePath);
         }
     }
 }

@@ -24,7 +24,7 @@ namespace CapuchinSync.Core.Tests.FunctionalTests
             FileSystem = new FileSystem();
             PathUtility = new PathUtility();
             HashUtility = new Sha1Hash();
-            FileCopierFactory = new FileCopierFactory();
+            FileCopierFactory = new FileCopierFactory(FileSystem, PathUtility);
             var tempDir = Path.GetTempPath();
             var rootTestDir = Path.Combine(tempDir, "DirectoryHashSyncTests");
             if (!Directory.Exists(rootTestDir))
@@ -33,7 +33,7 @@ namespace CapuchinSync.Core.Tests.FunctionalTests
             }
             var guid = Guid.NewGuid().ToString();
             TestSourceFolder = Path.Combine(rootTestDir, guid + "_source");
-            HashDictionaryFactory = new HashDictionaryFactory(HashUtility, TestSourceFolder);
+            HashDictionaryFactory = new HashDictionaryFactory(FileSystem, HashUtility, TestSourceFolder);
             TestDestinationFolder = Path.Combine(rootTestDir, guid + "_destination");
             EnsureFolderExists(TestSourceFolder);
             EnsureFolderExists(TestDestinationFolder);
@@ -61,7 +61,6 @@ namespace CapuchinSync.Core.Tests.FunctionalTests
                 Console.WriteLine($"Failed to delete test folder at {TestDestinationFolder}.\r\n\t{e}");
             }
         }
-
 
         public static string CreateFileWithFullPath(string fullPath, string contents)
         {
