@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CapuchinSync.Core.Interfaces;
@@ -10,11 +9,11 @@ namespace CapuchinSync.Core.GenerateSynchronizationDictionary
 {
     public class HashDictionaryGenerator : Loggable
     {
-        public HashDictionaryGenerator(GenerateSyncHashesArguments arguments, IFileSystem fileSystem, IHashUtility hashUtility, IPathUtility pathUtility)
+        public HashDictionaryGenerator(GenerateSyncHashesArguments arguments, IFileSystem fileSystem, IPathUtility pathUtility, IFileHasherFactory hasherFactory, IDateTimeProvider dateTimeProvider)
         {
             if(arguments == null) throw new ArgumentNullException(nameof(arguments));
 
-            var hashes = new List<FileHasher>();
+            var hashes = new List<IFileHasher>();
             Stopwatch watch = new Stopwatch();
             watch.Restart();
             var rootDir = arguments.RootDirectory;
@@ -29,35 +28,39 @@ namespace CapuchinSync.Core.GenerateSynchronizationDictionary
                 Parallel.ForEach(allFiles, file =>
                 {
                     FileCount++;
-                    var hasher = new FileHasher(hashUtility, rootDir, file);
                     // there's no point in recording the hash of the list of hashes.
-                    if (hasher.RelativePath.Equals(hashFile, StringComparison.InvariantCultureIgnoreCase)) return;
+                    if (file.EndsWith(hashFile, StringComparison.CurrentCultureIgnoreCase) && hashFile.Equals(pathUtility.GetFileName(file),
+                        StringComparison.InvariantCultureIgnoreCase)) return;
+                    var hasher = hasherFactory.CreateHasher(file);
                     hashes.Add(hasher);
                 });
             }
             catch (Exception e)
             {
-                throw new Exception($"Enumeration of directory {rootDir} failed: {e.Message}", e);
+                throw new Exception($"Enumeration of directory {rootDir} failed: {e.InnerException?.Message}", e);
             }
 
             HashDictionaryFilepath = pathUtility.Combine(rootDir, hashFile);
             var backupLocation = HashDictionaryFilepath + ".old";
             StringBuilder sb = new StringBuilder();
-            sb.AppendLine($"{hashes.Count} files found in {rootDir} on {DateTime.Now.ToLongDateString()} at {DateTime.Now.ToLongTimeString()}");
+            var now = dateTimeProvider.Now;
+            sb.AppendLine($"{hashes.Count} files found in {rootDir} on {dateTimeProvider.GetDateString(now)} at {dateTimeProvider.GetTimeString(now)}");
             foreach (var hash in hashes)
             {
-                sb.AppendLine(hash.ToString());
+                sb.AppendLine(hash.DictionaryEntryString);
             }
+            // If an old backup file exists, go ahead and delete it.
+            if (fileSystem.DoesFileExist(backupLocation))
+            {
+                fileSystem.DeleteFile(backupLocation);
+            }
+            // Now, if an old dictionary exists, move it to the backup location
             if (fileSystem.DoesFileExist(HashDictionaryFilepath))
             {
                 fileSystem.MoveFile(HashDictionaryFilepath, backupLocation);
             }
             fileSystem.WriteAsUtf8TextFile(HashDictionaryFilepath, sb.ToString());
-            if (fileSystem.DoesFileExist(backupLocation))
-            {
-                fileSystem.DeleteFile(backupLocation);
-            }
-
+            
             Info($"Hashes written to {HashDictionaryFilepath}");
 
             watch.Stop();

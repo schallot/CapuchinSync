@@ -24,10 +24,12 @@ namespace CapuchinSync.Hash
             }
             var hashUtility = new Sha1Hash();
             var pathUtility = new PathUtility();
+            var dateTimeProvider = new DateTimeProvider();
             try
             {
+                var hasherFactory = new FileHasherFactory(hashUtility, parser.Arguments.RootDirectory);
                 var hasherDictionaryGenerator =
-                    new HashDictionaryGenerator(parser.Arguments, fileSystem, hashUtility, pathUtility);
+                    new HashDictionaryGenerator(parser.Arguments, fileSystem, pathUtility, hasherFactory, dateTimeProvider);
                 Info($"Finished generating {hasherDictionaryGenerator.HashDictionaryFilepath}");
             }
             catch (Exception e)

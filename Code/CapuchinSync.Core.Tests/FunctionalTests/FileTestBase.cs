@@ -16,6 +16,7 @@ namespace CapuchinSync.Core.Tests.FunctionalTests
         protected IPathUtility PathUtility { get; set; }
         protected IHashUtility HashUtility { get; set; }
         protected IFileCopierFactory FileCopierFactory { get; set; }
+        protected IHashDictionaryFactory HashDictionaryFactory { get; set; }
 
         [SetUp]
         public void BaseSetup()
@@ -32,6 +33,7 @@ namespace CapuchinSync.Core.Tests.FunctionalTests
             }
             var guid = Guid.NewGuid().ToString();
             TestSourceFolder = Path.Combine(rootTestDir, guid + "_source");
+            HashDictionaryFactory = new HashDictionaryFactory(HashUtility, TestSourceFolder);
             TestDestinationFolder = Path.Combine(rootTestDir, guid + "_destination");
             EnsureFolderExists(TestSourceFolder);
             EnsureFolderExists(TestDestinationFolder);

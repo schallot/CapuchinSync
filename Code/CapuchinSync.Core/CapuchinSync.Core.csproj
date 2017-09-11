@@ -41,16 +41,21 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Constants.cs" />
+    <Compile Include="DateTimeProvider.cs" />
     <Compile Include="FIleCopierFactory.cs" />
+    <Compile Include="FileHasherFactory.cs" />
     <Compile Include="FileSystem.cs" />
     <Compile Include="GenerateSynchronizationDictionary\GenerateSyncHashesArguments.cs" />
     <Compile Include="GenerateSynchronizationDictionary\GenerateSyncHashesCommandLineArgumentParser.cs" />
     <Compile Include="GenerateSynchronizationDictionary\HashDictionaryGenerator.cs" />
+    <Compile Include="HashDictionaryFactory.cs" />
     <Compile Include="Hashes\HashDictionary.cs" />
     <Compile Include="Hashes\HashDictionaryEntry.cs" />
     <Compile Include="Hashes\HashDictionaryReader.cs" />
     <Compile Include="Hashes\HashDictionaryWriter.cs" />
+    <Compile Include="Interfaces\IHashDictionaryEntry.cs" />
     <Compile Include="Hashes\Sha1Hash.cs" />
+    <Compile Include="Interfaces\IDateTimeProvider.cs" />
     <Compile Include="Interfaces\IFileCopier.cs" />
     <Compile Include="Interfaces\IDirectorySynchArgument.cs" />
     <Compile Include="DirectorySynchronization\DirectorySynchCommandLineArgumentParser.cs" />
@@ -60,7 +65,10 @@
     <Compile Include="FileHasher.cs" />
     <Compile Include="DirectorySynchronization\HashVerifier.cs" />
     <Compile Include="Interfaces\IFileCopierFactory.cs" />
+    <Compile Include="Interfaces\IFileHasher.cs" />
+    <Compile Include="Interfaces\IFileHasherFactory.cs" />
     <Compile Include="Interfaces\IFileSystem.cs" />
+    <Compile Include="Interfaces\IHashDictionaryFactory.cs" />
     <Compile Include="Interfaces\IHashUtility.cs" />
     <Compile Include="Interfaces\ILogEntry.cs" />
     <Compile Include="Interfaces\ILoggable.cs" />

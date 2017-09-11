@@ -4,7 +4,7 @@ using CapuchinSync.Core.Interfaces;
 
 namespace CapuchinSync.Core
 {
-    public class FileHasher : Loggable
+    public class FileHasher : Loggable, IFileHasher
     {
         public FileHasher(IHashUtility hashUtility, string rootDirectory, string path)
         {
@@ -32,9 +32,6 @@ namespace CapuchinSync.Core
 
         public string Hash { get; }
 
-        public override string ToString()
-        {
-            return $"{Hash}{HashDictionaryEntry.Delimiter}{RelativePath}";
-        }
+        public string DictionaryEntryString => $"{Hash}{HashDictionaryEntry.Delimiter}{RelativePath}";
     }
 }

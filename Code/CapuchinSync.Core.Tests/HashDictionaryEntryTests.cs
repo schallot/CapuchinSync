@@ -1,4 +1,5 @@
-﻿using CapuchinSync.Core.Hashes;
+﻿using System;
+using CapuchinSync.Core.Hashes;
 using CapuchinSync.Core.Interfaces;
 using NUnit.Framework;
 
@@ -55,7 +56,7 @@ namespace CapuchinSync.Core.Tests
         }
 
         [Test]
-        public void HashDictionaryEntryConstructor_ShouldErrorInvalidHashCharacter()
+        public void HashDictionaryEntryConstructor_ShouldErrorOnInvalidHashCharacter()
         {
             var hash = "12345678901234567890123456789012345#7890";
             var path = "whatever.txt";
@@ -64,6 +65,40 @@ namespace CapuchinSync.Core.Tests
             var entry = new HashDictionaryEntry(_hashUtility, directory, hashLine);
             Assert.IsFalse(entry.IsValid, "Expected entry to be invalid.");
             Assert.AreEqual($"Hash <{hash}> in hash dictionary for folder {directory} contains non-hex character #.", entry.ErrorMessage, "Unexpected error message.");
+        }
+
+        [Test]
+        public void HashDictionaryEntryConstructor_ShouldWarnOnUnkownHash()
+        {
+            var hash = HashDictionaryEntry.UnknownHash;
+            var path = "whatever.txt";
+            var hashLine = $"{hash}{HashDictionaryEntry.Delimiter}{path}";
+            var directory = "C:\\Temp";
+            var entry = new HashDictionaryEntry(_hashUtility, directory, hashLine);
+            Assert.IsTrue(entry.IsValid, "Expected entry to be valid.");
+            Assert.AreEqual($"Hash dictionary line <{hashLine}> has a value that indicates that no hash could be generated for the file.  We'll err on the side of caution and copy the file.", entry.ErrorMessage, "Unexpected error message.");
+        }
+
+        [Test]
+        public void HashDictionaryEntryConstructor_ShouldErrorOnShortHash()
+        {
+            var hash = "ABC123";
+            var path = "whatever.txt";
+            var hashLine = $"{hash}{HashDictionaryEntry.Delimiter}{path}";
+            var directory = "C:\\Temp";
+            var entry = new HashDictionaryEntry(_hashUtility, directory, hashLine);
+            Assert.IsFalse(entry.IsValid, "Expected entry to be invalid.");
+            Assert.AreEqual($"Hash dictionary line <{hashLine}> has a hash with an insufficient number of characters (found 6, need {_hashUtility.HashLength})", entry.ErrorMessage, "Unexpected error message.");
+        }
+
+        [Test]
+        public void HashDictionaryEntryConstructor_ShouldThrowArgumentNullExceptionForNullHashUtility()
+        {
+            Assert.Throws<ArgumentNullException>(() =>
+            {
+                var entry = new HashDictionaryEntry(null, "C:\\temp",
+                    "1234567890123456789012345678901234567890\tblah.txt");
+            });
         }
     }
 }

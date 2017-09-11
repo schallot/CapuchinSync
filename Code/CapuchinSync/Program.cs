@@ -24,7 +24,8 @@ namespace CapuchinSync
             List<HashVerifier> hashesToVerify = new List<HashVerifier>();
             foreach (var argument in parser.DirectorySynchArguments)
             {
-                var reader = new HashDictionaryReader(hashUtility, argument.SourceDirectory, new FileSystem(), pathUtility);
+                HashDictionaryFactory dictionaryFactory = new HashDictionaryFactory(hashUtility, argument.SourceDirectory);
+                var reader = new HashDictionaryReader(argument.SourceDirectory, new FileSystem(), pathUtility, dictionaryFactory);
                 if (reader.ErrorCode != 0)
                 {
                     Console.WriteLine($"Failed to create hash dictionary reader for directory {argument.SourceDirectory}.  Returning error code {reader.ErrorCode}.");

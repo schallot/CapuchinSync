@@ -3,7 +3,7 @@ using CapuchinSync.Core.Interfaces;
 
 namespace CapuchinSync.Core.Hashes
 {
-    public class HashDictionaryEntry : Loggable
+    public class HashDictionaryEntry : Loggable, IHashDictionaryEntry
     {
         public string ErrorMessage { get; }
         /// <summary>
@@ -11,7 +11,7 @@ namespace CapuchinSync.Core.Hashes
         /// </summary>
         public const string Delimiter = "\t";
 
-        private static string[] SplitDelimiters = {Delimiter};
+        private static readonly string[] SplitDelimiters = {Delimiter};
 
         private const int HashIndex = 0;
         private const int FilePathIndex = 1;
@@ -57,7 +57,7 @@ namespace CapuchinSync.Core.Hashes
 
             if (UnknownHash.Equals(Hash, StringComparison.InvariantCultureIgnoreCase))
             {
-                ErrorMessage = $"Hash dictionary line <{hashFileLine}> has a hash that is too short (is {Hash.Length} characters, expected {hashUtility.HashLength})";
+                ErrorMessage = $"Hash dictionary line <{hashFileLine}> has a value that indicates that no hash could be generated for the file.  We'll err on the side of caution and copy the file.";
                 // We'll treat this as a warning, but we'll continue on and just accept that we'll have to copy this file without the benefit of a hash.
                 Warn(ErrorMessage);
             }
@@ -65,7 +65,7 @@ namespace CapuchinSync.Core.Hashes
             {
                 if (Hash.Length < hashUtility.HashLength)
                 {
-                    ErrorMessage = $"Hash dictionary line <{hashFileLine}> has an insufficient number of entries (found {split.Length}, need {minimumEntryLength})";
+                    ErrorMessage = $"Hash dictionary line <{hashFileLine}> has a hash with an insufficient number of characters (found {Hash.Length}, need {hashUtility.HashLength})";
                     Warn(ErrorMessage);
                     IsValid = false;
                     return;
