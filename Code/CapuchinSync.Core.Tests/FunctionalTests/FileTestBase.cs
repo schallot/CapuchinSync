@@ -25,7 +25,6 @@ namespace CapuchinSync.Core.Tests.FunctionalTests
             PathUtility = new PathUtility();
             HashUtility = new Sha1Hash();
             FileCopierFactory = new FileCopierFactory();
-            HashDictionaryFactory = new HashDictionaryFactory(HashUtility, TestSourceFolder);
             var tempDir = Path.GetTempPath();
             var rootTestDir = Path.Combine(tempDir, "DirectoryHashSyncTests");
             if (!Directory.Exists(rootTestDir))
@@ -34,6 +33,7 @@ namespace CapuchinSync.Core.Tests.FunctionalTests
             }
             var guid = Guid.NewGuid().ToString();
             TestSourceFolder = Path.Combine(rootTestDir, guid + "_source");
+            HashDictionaryFactory = new HashDictionaryFactory(HashUtility, TestSourceFolder);
             TestDestinationFolder = Path.Combine(rootTestDir, guid + "_destination");
             EnsureFolderExists(TestSourceFolder);
             EnsureFolderExists(TestDestinationFolder);
