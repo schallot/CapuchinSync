@@ -38,23 +38,5 @@ namespace CapuchinSync.Core.Tests.FunctionalTests
                 Assert.AreEqual(expectedFile.Contents, actualContents, $"Unexpected contents of target file {expectedFile.Path}.");
             }
         }
-
-        [Test]
-        public void ConstructorTest_ShouldThrowArgumentNullExceptionWithNullFileSystem()
-        {
-            Assert.Throws<ArgumentNullException>(() => new DirectorySyncher(null, PathUtility, FileCopierFactory));
-        }
-
-        [Test]
-        public void ConstructorTest_ShouldThrowArgumentNullExceptionWithNullPathUtility()
-        {
-            Assert.Throws<ArgumentNullException>(() => new DirectorySyncher(FileSystem, null, FileCopierFactory));
-        }
-
-        [Test]
-        public void ConstructorTest_ShouldThrowArgumentNullExceptionWithFileCopierFactory()
-        {
-            Assert.Throws<ArgumentNullException>(() => new DirectorySyncher(FileSystem, PathUtility, null));
-        }
     }
 }
