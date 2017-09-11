@@ -63,7 +63,7 @@ namespace CapuchinSync.Core.DirectorySynchronization
                 }
                 foreach (var unknown in unknownStatus)
                 {
-                    Error($"Failed to validate file at {unknown.FullTargetPath}: {unknown.ErrorMessage}");
+                    Error($"Failed to validate file at {unknown.FullTargetPath}");
                     _failedReads++;
                 }
             }

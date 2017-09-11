@@ -6,7 +6,6 @@ namespace CapuchinSync.Core.DirectorySynchronization
 {
     public class HashVerifier : Loggable
     {
-        public string ErrorMessage { get; } = "";
         private VerificationStatus _status = VerificationStatus.TargetFileNotRead;
         private string _calculatedHash;
         private readonly IFileSystem _fileSystem;
