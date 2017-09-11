@@ -61,9 +61,10 @@ namespace CapuchinSync.Core.Tests.DirectorySynchronization
         [Test]
         public void Status_ShouldBeTargetFileNotReadWhenHashCalculationFails()
         {
+            _fileSystem.DoesFileExist(Arg.Any<string>()).Returns(true);
             _hashUtility.GetHashFromFile(Arg.Any<string>()).Throws(x => new Exception("Mock failure to calculate hash"));
             var verifier = new HashVerifier(_entry, targetRootDirectory, _fileSystem, _pathUtility, _hashUtility);
-            Assert.AreEqual(HashVerifier.VerificationStatus.TargetFileDoesNotExist, verifier.Status);
+            Assert.AreEqual(HashVerifier.VerificationStatus.TargetFileNotRead, verifier.Status);
         }
 
         [Test]
