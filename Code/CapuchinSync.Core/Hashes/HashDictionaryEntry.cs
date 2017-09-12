@@ -21,8 +21,7 @@ namespace CapuchinSync.Core.Hashes
         /// </summary>
         public const string UnknownHash = "?";
 
-        public HashDictionaryEntry(IFileSystem fileSystem, IHashUtility hashUtility, string rootDirectory, string hashFileLine)
-            : base(fileSystem)
+        public HashDictionaryEntry(IHashUtility hashUtility, string rootDirectory, string hashFileLine)
         {
             if(hashUtility == null) throw new ArgumentNullException(nameof(hashUtility));
             _dictionaryLine = hashFileLine;

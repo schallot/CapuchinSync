@@ -17,7 +17,7 @@ namespace CapuchinSync.Core.DirectorySynchronization
 
         public int ErrorNumber { get; private set; }
 
-        public DirectorySynchCommandLineArgumentParser(IFileSystem fileSystem, IEnumerable<string> commandLineArgs) : base(fileSystem)
+        public DirectorySynchCommandLineArgumentParser(IEnumerable<string> commandLineArgs)
         {
             var args = new List<string>();
             if(commandLineArgs != null) args.AddRange(commandLineArgs);

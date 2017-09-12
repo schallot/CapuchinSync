@@ -6,8 +6,7 @@ namespace CapuchinSync.Core
 {
     public class FileHasher : Loggable, IFileHasher
     {
-        public FileHasher(IFileSystem fileSystem, IHashUtility hashUtility, string rootDirectory, string path)
-            : base(fileSystem)
+        public FileHasher(IHashUtility hashUtility, string rootDirectory, string path)
         {
             if(hashUtility == null) throw new ArgumentNullException(nameof(hashUtility));
             Trace($"Creating instance of {nameof(FileHasher)} with hash <{hashUtility.HashName}> for path {path} in directory {rootDirectory}.");

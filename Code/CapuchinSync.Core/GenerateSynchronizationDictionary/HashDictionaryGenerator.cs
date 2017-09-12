@@ -10,7 +10,6 @@ namespace CapuchinSync.Core.GenerateSynchronizationDictionary
     public class HashDictionaryGenerator : Loggable
     {
         public HashDictionaryGenerator(GenerateSyncHashesArguments arguments, IFileSystem fileSystem, IPathUtility pathUtility, IFileHasherFactory hasherFactory, IDateTimeProvider dateTimeProvider)
-            : base(fileSystem)
         {
             if(arguments == null) throw new ArgumentNullException(nameof(arguments));
 

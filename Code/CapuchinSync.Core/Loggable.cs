@@ -8,13 +8,6 @@ namespace CapuchinSync.Core
 {
     public abstract class Loggable : ILoggable
     {
-        protected IFileSystem FileSystem { get; }
-
-        protected Loggable(IFileSystem fileSystem)
-        {
-            FileSystem = fileSystem;
-        }
-
         public static List<LogEntry> AllLogEntries { get; } = new List<LogEntry>();
 
         public static void WriteAllLogEntriesToFile(string path)

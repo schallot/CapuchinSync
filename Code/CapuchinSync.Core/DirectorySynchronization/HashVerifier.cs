@@ -4,10 +4,11 @@ using CapuchinSync.Core.Interfaces;
 
 namespace CapuchinSync.Core.DirectorySynchronization
 {
-    public class HashVerifier : Loggable, IHashVerifier
+    public class HashVerifier : Loggable
     {
         private VerificationStatus _status = VerificationStatus.TargetFileNotRead;
         private string _calculatedHash;
+        private readonly IFileSystem _fileSystem;
         private readonly IHashUtility _hashUtility;
         public IHashDictionaryEntry HashEntry { get; }
 
@@ -22,7 +23,6 @@ namespace CapuchinSync.Core.DirectorySynchronization
         public HashVerifier(IHashDictionaryEntry entry, string targetDirectory, 
             IFileSystem fileSystem, IPathUtility pathUtility,
             IHashUtility hashUtility)
-            : base(fileSystem)
         {
             if (entry == null)
             {
@@ -41,6 +41,7 @@ namespace CapuchinSync.Core.DirectorySynchronization
             HashEntry = entry;
             RootSourceDirectory = entry.RootDirectory;
             RootTargetDirectory = targetDirectory;
+            _fileSystem = fileSystem;
             FullSourcePath = pathUtility.Combine(RootSourceDirectory, HashEntry.RelativePath);
             FullTargetPath = pathUtility.Combine(RootTargetDirectory, HashEntry.RelativePath);
         }
@@ -57,7 +58,7 @@ namespace CapuchinSync.Core.DirectorySynchronization
                         // TODO: Examine file size, last write time to determine if we really need to copy?
                         Warn($"No hash was present for file {FullTargetPath}.  The file will be overwritten with source {FullSourcePath}.  When possible, try regenerating the hash dictionary file.");
                     }
-                    else if (!FileSystem.DoesFileExist(FullTargetPath))
+                    else if (!_fileSystem.DoesFileExist(FullTargetPath))
                     {
                         _status = VerificationStatus.TargetFileDoesNotExist;
                         Info($"File at {FullTargetPath} does not exist, so it will have to be copied from source.");

@@ -4,18 +4,9 @@ namespace CapuchinSync.Core
 {
     public class FileCopierFactory : IFileCopierFactory
     {
-        private readonly IFileSystem _fileSystem;
-        private readonly IPathUtility _pathUtility;
-
-        public FileCopierFactory(IFileSystem fileSystem, IPathUtility pathUtility)
+        public IFileCopier CreateFileCopier(IFileSystem fileSystem, IPathUtility pathUtility, string source, string destination)
         {
-            _fileSystem = fileSystem;
-            _pathUtility = pathUtility;
-        }
-
-        public IFileCopier CreateFileCopier(string source, string destination)
-        {
-            return new FileCopier(_fileSystem, _pathUtility, source, destination);
+            return new FileCopier(fileSystem, pathUtility, source, destination);
         }
     }
 }

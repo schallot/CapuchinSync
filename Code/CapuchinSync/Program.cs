@@ -7,15 +7,15 @@ using CapuchinSync.Core.Hashes;
 
 namespace CapuchinSync
 {
-    public class Program
+    public class Program : Loggable
     {
         public static int Main(string[] args)
         {
             var fileSystem = new FileSystem();
             var pathUtility = new PathUtility();
             var hashUtility = new Sha1Hash();
-            var fileCopierFactory = new FileCopierFactory(fileSystem, pathUtility);
-            var parser = new DirectorySynchCommandLineArgumentParser(fileSystem,args);
+            var fileCopierFactory = new FileCopierFactory();
+            var parser = new DirectorySynchCommandLineArgumentParser(args);
             if (parser.ErrorNumber != 0)
             {
                 Console.WriteLine($"Failed to parse command line arguments.  Returning error code {parser.ErrorNumber}.");
@@ -24,7 +24,7 @@ namespace CapuchinSync
             List<HashVerifier> hashesToVerify = new List<HashVerifier>();
             foreach (var argument in parser.DirectorySynchArguments)
             {
-                HashDictionaryFactory dictionaryFactory = new HashDictionaryFactory(fileSystem, hashUtility, argument.SourceDirectory);
+                HashDictionaryFactory dictionaryFactory = new HashDictionaryFactory(hashUtility, argument.SourceDirectory);
                 var reader = new HashDictionaryReader(argument.SourceDirectory, new FileSystem(), pathUtility, dictionaryFactory);
                 if (reader.ErrorCode != 0)
                 {

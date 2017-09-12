@@ -15,7 +15,7 @@ namespace CapuchinSync.Core.Tests.FunctionalTests
         {
             var testFile = TestSet1.First();
             CreateFile(testFile);
-            var hasher = new FileHasher(FileSystem, HashUtility, TestSourceFolder, testFile.FilePath);
+            var hasher = new FileHasher(HashUtility, TestSourceFolder, testFile.FilePath);
             Assert.AreEqual(testFile.Hash, hasher.Hash);
         }
 
@@ -23,7 +23,7 @@ namespace CapuchinSync.Core.Tests.FunctionalTests
         public void Constructor_ShouldThrowArgumentNullExceptionForNullHashUtility()
         {
             Assert.Throws<ArgumentNullException>(
-                () => new FileHasher(FileSystem, null, TestSourceFolder, TestSet1.First().FilePath));
+                () => new FileHasher(null, TestSourceFolder, TestSet1.First().FilePath));
         }
 
         [Test]
@@ -36,7 +36,7 @@ namespace CapuchinSync.Core.Tests.FunctionalTests
             var exMessage = "Kablamo";
             HashUtility.GetHashFromFile("").ThrowsForAnyArgs(new Exception(exMessage));
 
-            var hasher = new FileHasher(FileSystem, HashUtility, TestSourceFolder, testFile.FilePath);
+            var hasher = new FileHasher(HashUtility, TestSourceFolder, testFile.FilePath);
 
             Assert.AreEqual(HashDictionaryEntry.UnknownHash, hasher.Hash, "Expected the Unknown Hash value for hour hash, since the file could not be read.");
             Assert.IsTrue(hasher.LogEntries.Any(x=>x.Severity == LogEntry.LogSeverity.Warning), "Expected at least one warning log entry to be generated, since the file could not be read.");
@@ -48,7 +48,7 @@ namespace CapuchinSync.Core.Tests.FunctionalTests
         {
             var testFile = TestSet1.First();
             CreateFile(testFile);
-            var hasher = new FileHasher(FileSystem, HashUtility, TestSourceFolder, testFile.FilePath);
+            var hasher = new FileHasher(HashUtility, TestSourceFolder, testFile.FilePath);
 
             Assert.AreEqual($"{testFile.Hash}{HashDictionaryEntry.Delimiter}{testFile.RelativePath}", hasher.DictionaryEntryString);
         }
