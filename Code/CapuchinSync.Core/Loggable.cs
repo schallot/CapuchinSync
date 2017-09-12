@@ -10,9 +10,9 @@ namespace CapuchinSync.Core
     {
         public static List<LogEntry> AllLogEntries { get; } = new List<LogEntry>();
 
-        public static void WriteAllLogEntriesToFile(string path)
+        public static void WriteAllLogEntriesToFile(string path, IFileSystem fileSystem)
         {
-            File.WriteAllLines(path, AllLogEntries.OrderBy(x=>x.EntryDate).Select(x=>x.ToString()));
+            fileSystem.WriteAllLinesAsUtf8TextFile(path, AllLogEntries.OrderBy(x => x.EntryDate).Select(x => x.ToString()));
         }
         
         public List<LogEntry> LogEntries { get; } = new List<LogEntry>();

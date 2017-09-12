@@ -4,7 +4,7 @@ using CapuchinSync.Core.Interfaces;
 
 namespace CapuchinSync.Core.DirectorySynchronization
 {
-    public class HashVerifier : Loggable
+    public class HashVerifier : Loggable, IHashVerifier
     {
         private VerificationStatus _status = VerificationStatus.TargetFileNotRead;
         private string _calculatedHash;

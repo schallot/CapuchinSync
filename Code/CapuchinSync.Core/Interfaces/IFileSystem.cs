@@ -62,5 +62,12 @@ namespace CapuchinSync.Core.Interfaces
         /// <param name="path">The path.</param>
         /// <param name="contents">The contents.</param>
         void WriteAsUtf8TextFile(string path, string contents);
+
+        /// <summary>
+        /// Writes as UTF8 text file.
+        /// </summary>
+        /// <param name="path">The path.</param>
+        /// <param name="lines">The lines to be written to the file.</param>
+        void WriteAllLinesAsUtf8TextFile(string path, IEnumerable<string> lines);
     }
 }

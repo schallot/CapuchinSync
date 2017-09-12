@@ -14,7 +14,7 @@ namespace CapuchinSync
             var fileSystem = new FileSystem();
             var pathUtility = new PathUtility();
             var hashUtility = new Sha1Hash();
-            var fileCopierFactory = new FileCopierFactory();
+            var fileCopierFactory = new FileCopierFactory(fileSystem, pathUtility);
             var parser = new DirectorySynchCommandLineArgumentParser(args);
             if (parser.ErrorNumber != 0)
             {
