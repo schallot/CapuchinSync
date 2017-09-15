@@ -150,7 +150,7 @@ namespace CapuchinSync.Core.Tests.DirectorySynchronization
         public void Synchronize_ExpectAllUnverifiedFilesToBeCopiedOver()
         {
             var synchronizer =
-                new DirectorySyncher(_fileSystem, _pathUtility, _fileCopierFactory) {OpenLogInNotepad = false};
+                new DirectorySyncher(_fileSystem, _pathUtility, _fileCopierFactory);
             synchronizer.Synchronize(_verifiers);
          
             Assert.IsTrue(_mismatchedVerifierCopier1.PerformCopyWasCalled, "Expected mismatched verifier 1 to result in a file copy");

@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using CapuchinSync.Core.DirectorySynchronization;
 using CapuchinSync.Core.Hashes;
@@ -19,10 +18,7 @@ namespace CapuchinSync.Core.Tests.FunctionalTests
                     FileSystem, PathUtility, HashUtility
                 )).ToList();
 
-            var syncher = new DirectorySyncher(FileSystem, PathUtility, FileCopierFactory)
-            {
-                OpenLogInNotepad = false
-            };
+            var syncher = new DirectorySyncher(FileSystem, PathUtility, FileCopierFactory);
             syncher.Synchronize(sets);
 
             var expectedFiles = TestSet1.Select(x => new

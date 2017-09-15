@@ -73,7 +73,9 @@
     <Compile Include="Interfaces\IHashUtility.cs" />
     <Compile Include="Interfaces\ILogEntry.cs" />
     <Compile Include="Interfaces\ILoggable.cs" />
+    <Compile Include="Interfaces\ILogViewer.cs" />
     <Compile Include="Interfaces\IPathUtility.cs" />
+    <Compile Include="TextFileLogViewer.cs" />
     <Compile Include="LogEntry.cs" />
     <Compile Include="Loggable.cs" />
     <Compile Include="PathUtility.cs" />

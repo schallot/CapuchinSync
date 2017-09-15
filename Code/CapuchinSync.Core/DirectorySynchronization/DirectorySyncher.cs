@@ -8,17 +8,18 @@ namespace CapuchinSync.Core.DirectorySynchronization
     public class DirectorySyncher : Loggable
     {
         private int _filesExamined;
-        public bool OpenLogInNotepad = false;
         private readonly IFileSystem _fileSystem;
         private readonly IPathUtility _pathUtility;
         private readonly IFileCopierFactory _fileCopierFactory;
+        private readonly ILogViewer _logViewer;
 
-        public DirectorySyncher(IFileSystem fileSystem, IPathUtility pathUtility, IFileCopierFactory fileCopierFactory)
+        public DirectorySyncher(IFileSystem fileSystem, IPathUtility pathUtility, IFileCopierFactory fileCopierFactory, ILogViewer logViewer = null)
         {
             if(fileSystem == null) throw new ArgumentNullException(nameof(fileSystem));
             if(pathUtility == null) throw new ArgumentNullException(nameof(pathUtility));
             if(fileCopierFactory == null) throw new ArgumentNullException(nameof(fileCopierFactory));
             Trace($"Creating instance of {nameof(DirectorySyncher)} with filesystem of type {fileSystem.GetType()}");
+            _logViewer = logViewer;
             _fileSystem = fileSystem;
             _pathUtility = pathUtility;
             _fileCopierFactory = fileCopierFactory;
@@ -72,14 +73,8 @@ namespace CapuchinSync.Core.DirectorySynchronization
                 }
             }
 
-            var tempFile = _pathUtility.GetTempFileName();
-            Info($"Writing log file to {tempFile}");
             Info($"Finished synchronization of {_filesExamined} files after {copies} file copies.");
-            WriteAllLogEntriesToFile(tempFile, _fileSystem);
-            if (OpenLogInNotepad)
-            {
-                System.Diagnostics.Process.Start(@"C:\Program Files (x86)\Notepad++\notepad++.exe", tempFile);
-            }
+            _logViewer?.ViewLogs(AllLogEntries);
             return 0;
         }
     }
