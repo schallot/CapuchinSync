@@ -20,12 +20,83 @@ namespace CapuchinSync.Core.Tests.DirectorySynchronization
         private IHashVerifier _missingTargetVerifier;
         private List<IHashVerifier> _verifiers;
 
-        private IFileCopier _unknownVerifierCopier;
-        private IFileCopier _mismatchedVerifierCopier;
-        private IFileCopier _missingTargetVerifierCopier;
+        private TestFileCopier _unknownVerifierCopier;
+        private TestFileCopier _mismatchedVerifierCopier;
+        private TestFileCopier _missingTargetVerifierCopier;
 
         private const string RootSourcePath = "C:\\source";
         private const string RootTargetPath = "D:\\target";
+
+        public class TestFileCopier : IFileCopier
+        {
+            public string Source { get; set; }
+            public string Destination { get; set; }
+            public bool SuccesfullyCopied { get; set; } = true;
+            public bool PerformCopyWasCalled { get; private set; }
+            public void PerformCopy()
+            {
+                PerformCopyWasCalled = true;
+            }
+        }
+
+        //public class TestFileCopierFactory : IFileCopierFactory
+        //{
+        //    public IFileCopier CreateFileCopier(string source, string destination)
+        //    {
+        //        return new TestFileCopier
+        //        {
+        //            Destination = destination,
+        //            Source = source
+        //        };
+        //    }
+        //}
+
+        public class TestHashVerifier : IHashVerifier
+        {
+            public TestHashVerifier(string calculatedHash, string name, string rootSourceDirectory, string rootTargetDirectory, HashVerifier.VerificationStatus status, string errorMessage = "")
+            {
+                CalculatedHash = calculatedHash;
+                FullSourcePath = $"{name}FullSourcePath";
+                FullTargetPath = $"{name}FullTargetPath";
+                _hashEntry = new TestHashDictionaryEntry(errorMessage, calculatedHash, string.IsNullOrWhiteSpace(errorMessage), name, rootSourceDirectory);
+                RootSourceDirectory = rootSourceDirectory;
+                RootTargetDirectory = rootTargetDirectory;
+                Status = status;
+            }
+
+            public class TestHashDictionaryEntry : IHashDictionaryEntry
+            {
+                public TestHashDictionaryEntry(string errorMessage, string hash, bool isValid, string relativePath, string rootDirectory)
+                {
+                    ErrorMessage = errorMessage;
+                    Hash = hash;
+                    IsValid = isValid;
+                    RelativePath = relativePath;
+                    RootDirectory = rootDirectory;
+                }
+
+                public string ErrorMessage { get; }
+                public string Hash { get; }
+                public bool IsValid { get; }
+                public string RelativePath { get; }
+                public string RootDirectory { get; }
+            }
+
+            public string CalculatedHash { get; }
+            public string FullSourcePath { get; }
+            public string FullTargetPath { get; }
+
+            private readonly IHashDictionaryEntry _hashEntry;
+
+            public IHashDictionaryEntry GetHashEntry()
+            {
+                return _hashEntry;
+            }
+
+            public string RootSourceDirectory { get; }
+            public string RootTargetDirectory { get; }
+            public HashVerifier.VerificationStatus Status { get; }
+        }
 
         [SetUp]
         public void SetUp()
@@ -34,41 +105,18 @@ namespace CapuchinSync.Core.Tests.DirectorySynchronization
             _pathUtility = Substitute.For<IPathUtility>();
             _fileCopierFactory = Substitute.For<IFileCopierFactory>();
 
-            _unknownVerifierCopier = Substitute.For<IFileCopier>();
-            _mismatchedVerifierCopier = Substitute.For<IFileCopier>();
-            _missingTargetVerifierCopier = Substitute.For<IFileCopier>();
+            _unknownVerifierCopier = new TestFileCopier();
+            _mismatchedVerifierCopier = new TestFileCopier();
+            _missingTargetVerifierCopier = new TestFileCopier();
 
-            _unknownVerifier = Substitute.For<IHashVerifier>();
-            _unknownVerifier.CalculatedHash.Returns("123");
-            _unknownVerifier.FullSourcePath.Returns("unknownVerifierFullSourcePath");
-            _unknownVerifier.FullTargetPath.Returns("unknownVerifierFullTargetPath");
-            _unknownVerifier.RootSourceDirectory.Returns(RootSourcePath);
-            _unknownVerifier.RootTargetDirectory.Returns(RootTargetPath);
-            _unknownVerifier.Status.Returns(HashVerifier.VerificationStatus.TargetFileNotRead);
-
-            _matchedVerifier = Substitute.For<IHashVerifier>();
-            _matchedVerifier.CalculatedHash.Returns("456");
-            _matchedVerifier.FullSourcePath.Returns("matchedVerifierFullSourcePath");
-            _matchedVerifier.FullTargetPath.Returns("matchedVerifierFullTargetPath");
-            _matchedVerifier.RootSourceDirectory.Returns(RootSourcePath);
-            _matchedVerifier.RootTargetDirectory.Returns(RootTargetPath);
-            _matchedVerifier.Status.Returns(HashVerifier.VerificationStatus.TargetFileMatchesHash);
-
-            _misMatchedVerifier = Substitute.For<IHashVerifier>();
-            _misMatchedVerifier.CalculatedHash.Returns("789");
-            _misMatchedVerifier.FullSourcePath.Returns("misMatchedVerifierFullSourcePath");
-            _misMatchedVerifier.FullTargetPath.Returns("misMatchedVerifierFullTargetPath");
-            _misMatchedVerifier.RootSourceDirectory.Returns(RootSourcePath);
-            _misMatchedVerifier.RootTargetDirectory.Returns(RootTargetPath);
-            _misMatchedVerifier.Status.Returns(HashVerifier.VerificationStatus.TargetFileDoesNotMatchHash);
-
-            _missingTargetVerifier = Substitute.For<IHashVerifier>();
-            _missingTargetVerifier.CalculatedHash.Returns("0AB");
-            _missingTargetVerifier.FullSourcePath.Returns("missingTargetVerifierFullSourcePath");
-            _missingTargetVerifier.FullTargetPath.Returns("missingTargetVerifierFullTargetPath");
-            _missingTargetVerifier.RootSourceDirectory.Returns(RootSourcePath);
-            _missingTargetVerifier.RootTargetDirectory.Returns(RootTargetPath);
-            _misMatchedVerifier.Status.Returns(HashVerifier.VerificationStatus.TargetFileDoesNotExist);
+            _unknownVerifier = new TestHashVerifier("123", "unknownVerifier", RootSourcePath, RootTargetPath, 
+                HashVerifier.VerificationStatus.TargetFileNotRead);
+            _matchedVerifier = new TestHashVerifier("456", "matchedVerifier", RootSourcePath, RootTargetPath,
+                HashVerifier.VerificationStatus.TargetFileMatchesHash);
+            _misMatchedVerifier = new TestHashVerifier("789", "misMatchedVerifier", RootSourcePath, RootTargetPath,
+                HashVerifier.VerificationStatus.TargetFileDoesNotMatchHash);
+            _missingTargetVerifier = new TestHashVerifier("0AB", "missingTargetVerifier", RootSourcePath, RootTargetPath,
+                HashVerifier.VerificationStatus.TargetFileDoesNotExist);
 
             _fileCopierFactory = Substitute.For<IFileCopierFactory>();
             _fileCopierFactory.CreateFileCopier(_unknownVerifier.FullSourcePath, _unknownVerifier.FullTargetPath)
@@ -78,19 +126,19 @@ namespace CapuchinSync.Core.Tests.DirectorySynchronization
             _fileCopierFactory.CreateFileCopier(_missingTargetVerifier.FullSourcePath, _missingTargetVerifier.FullTargetPath)
                 .Returns(_missingTargetVerifierCopier);
 
-            _unknownVerifierCopier.SuccesfullyCopied.Returns(true);
-            _mismatchedVerifierCopier.SuccesfullyCopied.Returns(true);
-            _missingTargetVerifierCopier.SuccesfullyCopied.Returns(true);
-
             _verifiers = new List<IHashVerifier>{_unknownVerifier, _matchedVerifier, _misMatchedVerifier, _missingTargetVerifier};
         }
 
         [Test]
-        public void SynchronizeTest()
+        public void Synchronize_ExpectAllUnverifiedFilesToBeCopiedOver()
         {
             var synchronizer =
                 new DirectorySyncher(_fileSystem, _pathUtility, _fileCopierFactory) {OpenLogInNotepad = false};
             synchronizer.Synchronize(_verifiers);
+            
+            Assert.IsTrue(_mismatchedVerifierCopier.PerformCopyWasCalled, "Expected mismatched verifier to result in a file copy");
+            Assert.IsTrue(_missingTargetVerifierCopier.PerformCopyWasCalled, "Expected missing target verifier to result in a file copy");
+            Assert.IsTrue(_unknownVerifierCopier.PerformCopyWasCalled, "Expected inability to generate hash to result in a file copy");
         }
 
         // ReSharper disable ObjectCreationAsStatement

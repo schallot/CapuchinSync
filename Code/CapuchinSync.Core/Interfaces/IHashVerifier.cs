@@ -7,7 +7,9 @@ namespace CapuchinSync.Core.Interfaces
         string CalculatedHash { get; }
         string FullSourcePath { get; }
         string FullTargetPath { get; }
-        IHashDictionaryEntry HashEntry { get; }
+
+        IHashDictionaryEntry GetHashEntry();
+
         string RootSourceDirectory { get; }
         string RootTargetDirectory { get; }
         HashVerifier.VerificationStatus Status { get; }

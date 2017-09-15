@@ -28,7 +28,7 @@ namespace CapuchinSync.Core.DirectorySynchronization
         public int Synchronize(IEnumerable<IHashVerifier> hashesToVerify)
         {
             var groups = hashesToVerify
-                .GroupBy(x => x.HashEntry.Hash).Select(x => x.ToArray()).ToArray();
+                .GroupBy(x => x.GetHashEntry().Hash).Select(x => x.ToArray()).ToArray();
 
             int copies = 0;
 
@@ -38,9 +38,10 @@ namespace CapuchinSync.Core.DirectorySynchronization
                 var matchingHashes = group.Where(x => x.Status == HashVerifier.VerificationStatus.TargetFileMatchesHash).ToList();
                 var misMatches = group.Where(x =>
                     x.Status == HashVerifier.VerificationStatus.TargetFileDoesNotMatchHash
-                    || x.Status == HashVerifier.VerificationStatus.TargetFileDoesNotExist).ToList();
+                    || x.Status == HashVerifier.VerificationStatus.TargetFileDoesNotExist
+                    || x.Status == HashVerifier.VerificationStatus.TargetFileNotRead).ToList();
 
-                if (!matchingHashes.Any())
+                if (misMatches.Any())
                 {
                     var firstMisMatch = misMatches.First();
                     misMatches.RemoveAt(0);
@@ -51,13 +52,17 @@ namespace CapuchinSync.Core.DirectorySynchronization
                     copies++;
                 }
 
-                var firstMatch = matchingHashes.First();
-                foreach (var mismatch in misMatches)
+                var firstMatch = matchingHashes.FirstOrDefault();
+                if (firstMatch != null)
                 {
-                    Info($"Updating {mismatch.FullTargetPath} from local {firstMatch.FullTargetPath}.");
-                    var copier = _fileCopierFactory.CreateFileCopier(firstMatch.FullTargetPath, mismatch.FullTargetPath);
-                    copier.PerformCopy();
-                    copies++;
+                    foreach (var mismatch in misMatches)
+                    {
+                        Info($"Updating {mismatch.FullTargetPath} from local {firstMatch.FullTargetPath}.");
+                        var copier =
+                            _fileCopierFactory.CreateFileCopier(firstMatch.FullTargetPath, mismatch.FullTargetPath);
+                        copier.PerformCopy();
+                        copies++;
+                    }
                 }
                 foreach (var unknown in unknownStatus)
                 {
@@ -67,12 +72,9 @@ namespace CapuchinSync.Core.DirectorySynchronization
             }
 
             var tempFile = _pathUtility.GetTempFileName();
-
             Info($"Writing log file to {tempFile}");
             Info($"Finished synchronization of {_filesExamined} files after {copies} file copies, with {_failedReads} target file validation errors.");
-
             WriteAllLogEntriesToFile(tempFile, _fileSystem);
-
             if (OpenLogInNotepad)
             {
                 System.Diagnostics.Process.Start(@"C:\Program Files (x86)\Notepad++\notepad++.exe", tempFile);
