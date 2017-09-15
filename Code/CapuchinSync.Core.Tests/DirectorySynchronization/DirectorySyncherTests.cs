@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using CapuchinSync.Core.DirectorySynchronization;
 using CapuchinSync.Core.Interfaces;
 using NSubstitute;
+using NSubstitute.Core;
 using NUnit.Framework;
 
 namespace CapuchinSync.Core.Tests.DirectorySynchronization
@@ -16,12 +17,14 @@ namespace CapuchinSync.Core.Tests.DirectorySynchronization
 
         private IHashVerifier _unknownVerifier;
         private IHashVerifier _matchedVerifier;
-        private IHashVerifier _misMatchedVerifier;
+        private IHashVerifier _misMatchedVerifier1;
+        private IHashVerifier _misMatchedVerifier2;
         private IHashVerifier _missingTargetVerifier;
         private List<IHashVerifier> _verifiers;
 
         private TestFileCopier _unknownVerifierCopier;
-        private TestFileCopier _mismatchedVerifierCopier;
+        private TestFileCopier _mismatchedVerifierCopier1;
+        private TestFileCopier _mismatchedVerifierCopier2;
         private TestFileCopier _missingTargetVerifierCopier;
 
         private const string RootSourcePath = "C:\\source";
@@ -29,8 +32,15 @@ namespace CapuchinSync.Core.Tests.DirectorySynchronization
 
         public class TestFileCopier : IFileCopier
         {
-            public string Source { get; set; }
-            public string Destination { get; set; }
+            public string Source { get; private set; }
+            public string Destination { get; private set; }
+
+            public void SetCopyInfo(CallInfo callInfo)
+            {
+                Source = callInfo[0].ToString();
+                Destination = callInfo[1].ToString();
+            }
+
             public bool SuccesfullyCopied { get; set; } = true;
             public bool PerformCopyWasCalled { get; private set; }
             public void PerformCopy()
@@ -38,18 +48,6 @@ namespace CapuchinSync.Core.Tests.DirectorySynchronization
                 PerformCopyWasCalled = true;
             }
         }
-
-        //public class TestFileCopierFactory : IFileCopierFactory
-        //{
-        //    public IFileCopier CreateFileCopier(string source, string destination)
-        //    {
-        //        return new TestFileCopier
-        //        {
-        //            Destination = destination,
-        //            Source = source
-        //        };
-        //    }
-        //}
 
         public class TestHashVerifier : IHashVerifier
         {
@@ -106,14 +104,18 @@ namespace CapuchinSync.Core.Tests.DirectorySynchronization
             _fileCopierFactory = Substitute.For<IFileCopierFactory>();
 
             _unknownVerifierCopier = new TestFileCopier();
-            _mismatchedVerifierCopier = new TestFileCopier();
+            _mismatchedVerifierCopier1 = new TestFileCopier();
+            _mismatchedVerifierCopier2 = new TestFileCopier();
             _missingTargetVerifierCopier = new TestFileCopier();
 
             _unknownVerifier = new TestHashVerifier("123", "unknownVerifier", RootSourcePath, RootTargetPath, 
                 HashVerifier.VerificationStatus.TargetFileNotRead);
             _matchedVerifier = new TestHashVerifier("456", "matchedVerifier", RootSourcePath, RootTargetPath,
                 HashVerifier.VerificationStatus.TargetFileMatchesHash);
-            _misMatchedVerifier = new TestHashVerifier("789", "misMatchedVerifier", RootSourcePath, RootTargetPath,
+            // These two files have matching hashes, but only one of them should end up copied from the source path: one should be copied from within the target folder
+            _misMatchedVerifier1 = new TestHashVerifier("789", "misMatchedVerifier1", RootSourcePath, RootTargetPath,
+                HashVerifier.VerificationStatus.TargetFileDoesNotMatchHash);
+            _misMatchedVerifier2 = new TestHashVerifier("789", "misMatchedVerifier2", RootSourcePath, RootTargetPath,
                 HashVerifier.VerificationStatus.TargetFileDoesNotMatchHash);
             _missingTargetVerifier = new TestHashVerifier("0AB", "missingTargetVerifier", RootSourcePath, RootTargetPath,
                 HashVerifier.VerificationStatus.TargetFileDoesNotExist);
@@ -121,12 +123,27 @@ namespace CapuchinSync.Core.Tests.DirectorySynchronization
             _fileCopierFactory = Substitute.For<IFileCopierFactory>();
             _fileCopierFactory.CreateFileCopier(_unknownVerifier.FullSourcePath, _unknownVerifier.FullTargetPath)
                 .Returns(_unknownVerifierCopier);
-            _fileCopierFactory.CreateFileCopier(_misMatchedVerifier.FullSourcePath, _misMatchedVerifier.FullTargetPath)
-                .Returns(_mismatchedVerifierCopier);
+            _fileCopierFactory.CreateFileCopier(_missingTargetVerifier.FullSourcePath, _missingTargetVerifier.FullTargetPath)
+                .Returns(_missingTargetVerifierCopier);
             _fileCopierFactory.CreateFileCopier(_missingTargetVerifier.FullSourcePath, _missingTargetVerifier.FullTargetPath)
                 .Returns(_missingTargetVerifierCopier);
 
-            _verifiers = new List<IHashVerifier>{_unknownVerifier, _matchedVerifier, _misMatchedVerifier, _missingTargetVerifier};
+            // For each mismatched file, we can't be sure if it's going to be copied from the source folder, or from 
+            // the files' local match in the target directory, so we'll have to account for all options.
+            _fileCopierFactory.CreateFileCopier(_misMatchedVerifier1.FullSourcePath, _misMatchedVerifier1.FullTargetPath)
+                .Returns(_mismatchedVerifierCopier1)
+                .AndDoes(x => _mismatchedVerifierCopier1.SetCopyInfo(x));
+            _fileCopierFactory.CreateFileCopier(_misMatchedVerifier2.FullSourcePath, _misMatchedVerifier2.FullTargetPath)
+                .Returns(_mismatchedVerifierCopier2)
+                .AndDoes(x => _mismatchedVerifierCopier2.SetCopyInfo(x));
+            _fileCopierFactory.CreateFileCopier(_misMatchedVerifier2.FullTargetPath, _misMatchedVerifier1.FullTargetPath)
+                .Returns(_mismatchedVerifierCopier1)
+                .AndDoes(x => _mismatchedVerifierCopier1.SetCopyInfo(x));
+            _fileCopierFactory.CreateFileCopier(_misMatchedVerifier1.FullSourcePath, _misMatchedVerifier2.FullTargetPath)
+                .Returns(_mismatchedVerifierCopier2)
+                .AndDoes(x => _mismatchedVerifierCopier2.SetCopyInfo(x));
+
+            _verifiers = new List<IHashVerifier>{_unknownVerifier, _matchedVerifier, _misMatchedVerifier2, _misMatchedVerifier1, _missingTargetVerifier};
         }
 
         [Test]
@@ -135,10 +152,33 @@ namespace CapuchinSync.Core.Tests.DirectorySynchronization
             var synchronizer =
                 new DirectorySyncher(_fileSystem, _pathUtility, _fileCopierFactory) {OpenLogInNotepad = false};
             synchronizer.Synchronize(_verifiers);
-            
-            Assert.IsTrue(_mismatchedVerifierCopier.PerformCopyWasCalled, "Expected mismatched verifier to result in a file copy");
+         
+            Assert.IsTrue(_mismatchedVerifierCopier1.PerformCopyWasCalled, "Expected mismatched verifier 1 to result in a file copy");
+            Assert.IsTrue(_mismatchedVerifierCopier2.PerformCopyWasCalled, "Expected mismatched verifier 1 to result in a file copy");
             Assert.IsTrue(_missingTargetVerifierCopier.PerformCopyWasCalled, "Expected missing target verifier to result in a file copy");
             Assert.IsTrue(_unknownVerifierCopier.PerformCopyWasCalled, "Expected inability to generate hash to result in a file copy");
+
+            Assert.AreEqual("misMatchedVerifier1FullTargetPath", _mismatchedVerifierCopier1.Destination, "_mismatchedVerifierCopier1 copied to an unexpected destination");
+            Assert.AreEqual("misMatchedVerifier2FullTargetPath", _mismatchedVerifierCopier2.Destination, "_mismatchedVerifierCopier2 copied to an unexpected destination");
+
+            if (_mismatchedVerifierCopier1.Source == "misMatchedVerifier1FullSourcePath")
+            {
+                Assert.AreEqual("misMatchedVerifier1FullTargetPath", _mismatchedVerifierCopier2.Source,
+                    $"Since {nameof(_mismatchedVerifierCopier1)} was copied from it's full source path, " +
+                    $"{nameof(_mismatchedVerifierCopier2)} should have been copied from  {nameof(_mismatchedVerifierCopier2)}'s target location, " +
+                    $"but instead it was copied from {_mismatchedVerifierCopier2.Source}");
+            }
+            else if (_mismatchedVerifierCopier2.Source == "misMatchedVerifier2FullSourcePath")
+            {
+                Assert.AreEqual("misMatchedVerifier2FullTargetPath", _mismatchedVerifierCopier1.Source,
+                    $"Since {nameof(_mismatchedVerifierCopier2)} was copied from it's full source path, " +
+                    $"{nameof(_mismatchedVerifierCopier1)} should have been copied from  {nameof(_mismatchedVerifierCopier1)}'s target location, " +
+                    $"but instead it was copied from {_mismatchedVerifierCopier1.Source}");
+            }
+            else
+            {
+                Assert.Fail($"Neither {nameof(_mismatchedVerifierCopier1)} nor {nameof(_mismatchedVerifierCopier2)} were copied from their respective FullSourcePaths, but instead they were {_mismatchedVerifierCopier1.Source} and {_mismatchedVerifierCopier2.Source}, respectively.");
+            }
         }
 
         // ReSharper disable ObjectCreationAsStatement
