@@ -61,11 +61,13 @@
     <Compile Include="FunctionalTests\FileTestBase.cs" />
     <Compile Include="FunctionalTests\HashDictionaryReaderTests.cs" />
     <Compile Include="FunctionalTests\HashVerifierTests.cs" />
+    <Compile Include="FunctionalTests\TextFileLogViewerTests.cs" />
     <Compile Include="GenerateSynchronizationDictionary\GenerateSyncHashesCommandLineArgumentParserTests.cs" />
     <Compile Include="GenerateSynchronizationDictionary\HashDictionaryGeneratorTests.cs" />
     <Compile Include="HashDictionaryEntryTests.cs" />
     <Compile Include="LoggableTests.cs" />
     <Compile Include="PathUtilityTests.cs" />
+    <Compile Include="FunctionalTests\ProcessStarterTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -75,6 +75,8 @@
     <Compile Include="Interfaces\ILoggable.cs" />
     <Compile Include="Interfaces\ILogViewer.cs" />
     <Compile Include="Interfaces\IPathUtility.cs" />
+    <Compile Include="Interfaces\IProcessStarter.cs" />
+    <Compile Include="ProcessStarter.cs" />
     <Compile Include="TextFileLogViewer.cs" />
     <Compile Include="LogEntry.cs" />
     <Compile Include="Loggable.cs" />

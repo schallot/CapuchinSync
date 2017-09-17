@@ -38,7 +38,8 @@ namespace CapuchinSync
                 }
                 hashesToVerify.AddRange(dictionary.Entries.Select(y => new HashVerifier(y, argument.TargetDirectory, fileSystem, pathUtility, hashUtility)));
             }
-            var logViewer = new TextFileLogViewer(pathUtility, fileSystem);
+            var processStarter = new ProcessStarter();
+            var logViewer = new TextFileLogViewer(pathUtility, fileSystem, processStarter);
             var syncher = new DirectorySyncher(new FileSystem(), pathUtility, fileCopierFactory, logViewer);
             return syncher.Synchronize(hashesToVerify);
         }

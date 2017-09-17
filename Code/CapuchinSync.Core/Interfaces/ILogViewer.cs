@@ -8,6 +8,6 @@ namespace CapuchinSync.Core.Interfaces
 {
     public interface ILogViewer
     {
-        void ViewLogs(IEnumerable<LogEntry> logs);
+        void ViewLogs(IEnumerable<ILogEntry> logs);
     }
 }

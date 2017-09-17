@@ -8,5 +8,6 @@ namespace CapuchinSync.Core.Interfaces
         Type LogSourceType { get; }
         string Message { get; }
         LogEntry.LogSeverity Severity { get; }
+        string FormattedLogLine { get; }
     }
 }

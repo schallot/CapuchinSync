@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using CapuchinSync.Core.Interfaces;
 
 namespace CapuchinSync.Core
@@ -8,15 +9,17 @@ namespace CapuchinSync.Core
         private readonly IPathUtility _pathUtility;
         private readonly IFileSystem _fileSystem;
         private readonly string _pathToTextEditor;
+        private readonly IProcessStarter _processStarter;
 
-        public TextFileLogViewer(IPathUtility pathUtility, IFileSystem fileSystem, string pathToTextEditor = "")
+        public TextFileLogViewer(IPathUtility pathUtility, IFileSystem fileSystem, IProcessStarter processStarter, string pathToTextEditor = "")
         {
             _pathUtility = pathUtility;
             _fileSystem = fileSystem;
             _pathToTextEditor = pathToTextEditor;
+            _processStarter = processStarter;
         }
 
-        public void ViewLogs(IEnumerable<LogEntry> logs)
+        public void ViewLogs(IEnumerable<ILogEntry> logs)
         {
             var tempFile = _pathUtility.GetTempFileName();
             Info($"Writing log file to {tempFile}");
@@ -32,7 +35,7 @@ namespace CapuchinSync.Core
             }
             WriteAllLogEntriesToFile(tempFile, _fileSystem);
             {
-                System.Diagnostics.Process.Start(textEditor, tempFile);
+                _processStarter.Start(textEditor, tempFile);
             }
         }
     }

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using CapuchinSync.Core.Interfaces;
 
@@ -8,11 +7,11 @@ namespace CapuchinSync.Core
 {
     public abstract class Loggable : ILoggable
     {
-        public static List<LogEntry> AllLogEntries { get; } = new List<LogEntry>();
+        public static List<ILogEntry> AllLogEntries { get; } = new List<ILogEntry>();
 
         public static void WriteAllLogEntriesToFile(string path, IFileSystem fileSystem)
         {
-            fileSystem.WriteAllLinesAsUtf8TextFile(path, AllLogEntries.OrderBy(x => x.EntryDate).Select(x => x.ToString()));
+            fileSystem.WriteAllLinesAsUtf8TextFile(path, AllLogEntries.OrderBy(x => x.EntryDate).Select(x => x.FormattedLogLine));
         }
         
         public List<LogEntry> LogEntries { get; } = new List<LogEntry>();
@@ -60,22 +59,22 @@ namespace CapuchinSync.Core
             switch (entry.Severity)
             {
                 case LogEntry.LogSeverity.Trace:
-                    WriteToConsole($"{entry}", ConsoleColor.DarkGray, DefaultBackground);
+                    WriteToConsole($"{entry.FormattedLogLine}", ConsoleColor.DarkGray, DefaultBackground);
                     break;
                 case LogEntry.LogSeverity.Debug:
-                    WriteToConsole($"{entry}", ConsoleColor.Gray, DefaultBackground);
+                    WriteToConsole($"{entry.FormattedLogLine}", ConsoleColor.Gray, DefaultBackground);
                     break;
                 case LogEntry.LogSeverity.Info:
-                    WriteToConsole($"{entry}", ConsoleColor.White, DefaultBackground);
+                    WriteToConsole($"{entry.FormattedLogLine}", ConsoleColor.White, DefaultBackground);
                     break;
                 case LogEntry.LogSeverity.Warning:
-                    WriteToConsole($"{entry}", ConsoleColor.DarkYellow, DefaultBackground);
+                    WriteToConsole($"{entry.FormattedLogLine}", ConsoleColor.DarkYellow, DefaultBackground);
                     break;
                 case LogEntry.LogSeverity.Error:
-                    WriteToConsole($"{entry}", ConsoleColor.Red, DefaultBackground);
+                    WriteToConsole($"{entry.FormattedLogLine}", ConsoleColor.Red, DefaultBackground);
                     break;
                 case LogEntry.LogSeverity.Fatal:
-                    WriteToConsole($"{entry}", ConsoleColor.Black, ConsoleColor.Red);
+                    WriteToConsole($"{entry.FormattedLogLine}", ConsoleColor.Black, ConsoleColor.Red);
                     break;
             }
         }
