@@ -2,7 +2,6 @@
 {
     public interface IFileCopierFactory
     {
-        IFileCopier CreateFileCopier(IFileSystem fileSystem, IPathUtility pathUtility, string source,
-            string destination);
+        IFileCopier CreateFileCopier(string source, string destination);
     }
 }

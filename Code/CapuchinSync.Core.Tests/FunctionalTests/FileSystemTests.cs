@@ -135,5 +135,16 @@ namespace CapuchinSync.Core.Tests.FunctionalTests
             var actualContents = File.ReadAllText(target);
             Assert.AreEqual(contents, actualContents, $"Unexpected contents at {target}.");
         }
+
+        [Test]
+        public void WriteLinesAsUtf8_ShouldBeSuccessful()
+        {
+            var fileGuid = Guid.NewGuid();
+            var target = Path.Combine(TestSourceFolder, fileGuid.ToString("N") + "_source.txt");
+            var lines = new [] {"line1", "line2", "line3"};
+            FileSystem.WriteAllLinesAsUtf8TextFile(target, lines);
+            var actualContents = File.ReadAllText(target);
+            Assert.AreEqual(string.Join("\r\n",lines) + "\r\n", actualContents, $"Unexpected contents at {target}.");
+        }
     }
 }

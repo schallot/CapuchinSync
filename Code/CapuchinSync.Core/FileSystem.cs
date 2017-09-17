@@ -98,5 +98,15 @@ namespace CapuchinSync.Core
         {
             File.WriteAllText(path, contents, Encoding.UTF8);
         }
+
+        /// <summary>
+        /// Writes lines as a UTF8 text file.
+        /// </summary>
+        /// <param name="path">The path.</param>
+        /// <param name="lines">The lines to be written to the file.</param>
+        public void WriteAllLinesAsUtf8TextFile(string path, IEnumerable<string> lines)
+        {
+            File.WriteAllLines(path, lines, Encoding.UTF8);
+        }
     }
 }

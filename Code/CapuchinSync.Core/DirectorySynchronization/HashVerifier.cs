@@ -4,13 +4,18 @@ using CapuchinSync.Core.Interfaces;
 
 namespace CapuchinSync.Core.DirectorySynchronization
 {
-    public class HashVerifier : Loggable
+    public class HashVerifier : Loggable, IHashVerifier
     {
         private VerificationStatus _status = VerificationStatus.TargetFileNotRead;
         private string _calculatedHash;
         private readonly IFileSystem _fileSystem;
         private readonly IHashUtility _hashUtility;
-        public IHashDictionaryEntry HashEntry { get; }
+        private readonly IHashDictionaryEntry hashEntry;
+
+        public IHashDictionaryEntry GetHashEntry()
+        {
+            return hashEntry;
+        }
 
         public enum VerificationStatus
         {
@@ -38,12 +43,12 @@ namespace CapuchinSync.Core.DirectorySynchronization
             }
             _hashUtility = hashUtility ?? throw new ArgumentNullException(nameof(hashUtility));
             Trace($"Creating {hashUtility.HashName} {nameof(HashVerifier)} for hash dictionary entry:<{entry}> with root source directory <{entry.RootDirectory}> and root target directory <{targetDirectory}>");
-            HashEntry = entry;
+            hashEntry = entry;
             RootSourceDirectory = entry.RootDirectory;
             RootTargetDirectory = targetDirectory;
             _fileSystem = fileSystem;
-            FullSourcePath = pathUtility.Combine(RootSourceDirectory, HashEntry.RelativePath);
-            FullTargetPath = pathUtility.Combine(RootTargetDirectory, HashEntry.RelativePath);
+            FullSourcePath = pathUtility.Combine(RootSourceDirectory, GetHashEntry().RelativePath);
+            FullTargetPath = pathUtility.Combine(RootTargetDirectory, GetHashEntry().RelativePath);
         }
 
         public VerificationStatus Status 
@@ -52,7 +57,7 @@ namespace CapuchinSync.Core.DirectorySynchronization
             {
                 if (_status == VerificationStatus.TargetFileNotRead)
                 {
-                    if (HashEntry.Hash == HashDictionaryEntry.UnknownHash)
+                    if (GetHashEntry().Hash == HashDictionaryEntry.UnknownHash)
                     {
                         _status = VerificationStatus.TargetFileDoesNotMatchHash;
                         // TODO: Examine file size, last write time to determine if we really need to copy?
@@ -67,7 +72,7 @@ namespace CapuchinSync.Core.DirectorySynchronization
                     {
                         try
                         {                            
-                            if (CalculatedHash == HashEntry.Hash)
+                            if (CalculatedHash == GetHashEntry().Hash)
                             {
                                 _status = VerificationStatus.TargetFileMatchesHash;
                                 Debug($"File at {FullTargetPath} matches source at {FullSourcePath} with hash {CalculatedHash}, so no further action is needed.");
@@ -75,12 +80,12 @@ namespace CapuchinSync.Core.DirectorySynchronization
                             else
                             {
                                 _status = VerificationStatus.TargetFileDoesNotMatchHash;
-                                Info($"File at {FullTargetPath} has hash {CalculatedHash}, which does not match {HashEntry.Hash} of source {FullSourcePath}, so it will have to be copied from source.");
+                                Info($"File at {FullTargetPath} has hash {CalculatedHash}, which does not match {GetHashEntry().Hash} of source {FullSourcePath}, so it will have to be copied from source.");
                             }
                         }
                         catch (Exception e)
                         {
-                            Error($"Failed to verify hash of file at {FullTargetPath} - expected hash {HashEntry.Hash}", e);
+                            Error($"Failed to verify hash of file at {FullTargetPath} - expected hash {GetHashEntry().Hash}", e);
                             _status = VerificationStatus.TargetFileNotRead;
                         }
                     }

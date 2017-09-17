@@ -14,7 +14,7 @@ namespace CapuchinSync
             var fileSystem = new FileSystem();
             var pathUtility = new PathUtility();
             var hashUtility = new Sha1Hash();
-            var fileCopierFactory = new FileCopierFactory();
+            var fileCopierFactory = new FileCopierFactory(fileSystem, pathUtility);
             var parser = new DirectorySynchCommandLineArgumentParser(args);
             if (parser.ErrorNumber != 0)
             {
@@ -38,7 +38,9 @@ namespace CapuchinSync
                 }
                 hashesToVerify.AddRange(dictionary.Entries.Select(y => new HashVerifier(y, argument.TargetDirectory, fileSystem, pathUtility, hashUtility)));
             }
-            var syncher = new DirectorySyncher(new FileSystem(), pathUtility, fileCopierFactory) {OpenLogInNotepad = true};
+            var processStarter = new ProcessStarter();
+            var logViewer = new TextFileLogViewer(pathUtility, fileSystem, processStarter);
+            var syncher = new DirectorySyncher(new FileSystem(), pathUtility, fileCopierFactory, logViewer);
             return syncher.Synchronize(hashesToVerify);
         }
 

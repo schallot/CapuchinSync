@@ -1,5 +1,4 @@
 ﻿using NUnit.Framework;
-using CapuchinSync.Core;
 using CapuchinSync.Core.Interfaces;
 using NSubstitute;
 

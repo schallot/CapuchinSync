@@ -1,6 +1,5 @@
 ﻿using System;
 using NUnit.Framework;
-using CapuchinSync.Core;
 
 namespace CapuchinSync.Core.Tests
 {

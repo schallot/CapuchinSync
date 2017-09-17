@@ -42,6 +42,7 @@
   <ItemGroup>
     <Compile Include="Constants.cs" />
     <Compile Include="DateTimeProvider.cs" />
+    <Compile Include="Interfaces\IHashVerifier.cs" />
     <Compile Include="FIleCopierFactory.cs" />
     <Compile Include="FileHasherFactory.cs" />
     <Compile Include="FileSystem.cs" />
@@ -72,7 +73,11 @@
     <Compile Include="Interfaces\IHashUtility.cs" />
     <Compile Include="Interfaces\ILogEntry.cs" />
     <Compile Include="Interfaces\ILoggable.cs" />
+    <Compile Include="Interfaces\ILogViewer.cs" />
     <Compile Include="Interfaces\IPathUtility.cs" />
+    <Compile Include="Interfaces\IProcessStarter.cs" />
+    <Compile Include="ProcessStarter.cs" />
+    <Compile Include="TextFileLogViewer.cs" />
     <Compile Include="LogEntry.cs" />
     <Compile Include="Loggable.cs" />
     <Compile Include="PathUtility.cs" />

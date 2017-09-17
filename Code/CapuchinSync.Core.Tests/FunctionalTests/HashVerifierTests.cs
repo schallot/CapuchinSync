@@ -17,7 +17,7 @@ namespace CapuchinSync.Core.Tests.FunctionalTests
             var entry = new HashDictionaryEntry(HashUtility, TestSourceFolder, testFile.HashFileLine);
             // It shouldn't matter if the source file exists or not, as long as the destination file's hash verifies.
             var verifier = new HashVerifier(entry, TestDestinationFolder, FileSystem, PathUtility, HashUtility);
-            Assert.AreEqual(testFile.Hash, verifier.HashEntry.Hash, $"File at {testFile.FilePath} has a different hash than what the verifier determined.");
+            Assert.AreEqual(testFile.Hash, verifier.GetHashEntry().Hash, $"File at {testFile.FilePath} has a different hash than what the verifier determined.");
             Assert.AreEqual(verifier.Status, HashVerifier.VerificationStatus.TargetFileMatchesHash, "Expected calculated hash to match the hash line.");
         }
 
@@ -56,7 +56,7 @@ namespace CapuchinSync.Core.Tests.FunctionalTests
             // It shouldn't matter if the source file exists or not, as long as the destination file's hash verifies.
             var entry = new HashDictionaryEntry(HashUtility, TestSourceFolder, testFile.HashFileLine);
             var verifier = new HashVerifier(entry, TestDestinationFolder, FileSystem, PathUtility, HashUtility);
-            Assert.AreEqual(testFile.Hash, verifier.HashEntry.Hash, "Unexpected ExpectedHash value");
+            Assert.AreEqual(testFile.Hash, verifier.GetHashEntry().Hash, "Unexpected ExpectedHash value");
         }
 
         // TODO: Test failed file read.

@@ -34,9 +34,6 @@ namespace CapuchinSync.Core
         public string Message { get; }
         public LogSeverity Severity { get; }
 
-        public override string ToString()
-        {
-            return $"{Severity.ToString().ToUpperInvariant()}: {EntryDate.ToShortDateString()}@{EntryDate.ToLongTimeString()}, {LogSourceType.Name}: {Message}";
-        }
+        public string FormattedLogLine => $"{Severity.ToString().ToUpperInvariant()}: {EntryDate.ToShortDateString()}@{EntryDate.ToLongTimeString()}, {LogSourceType.Name}: {Message}";
     }
 }

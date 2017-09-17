@@ -24,7 +24,7 @@ namespace CapuchinSync.Core.Tests.FunctionalTests
             FileSystem = new FileSystem();
             PathUtility = new PathUtility();
             HashUtility = new Sha1Hash();
-            FileCopierFactory = new FileCopierFactory();
+            FileCopierFactory = new FileCopierFactory(FileSystem, PathUtility);
             var tempDir = Path.GetTempPath();
             var rootTestDir = Path.Combine(tempDir, "DirectoryHashSyncTests");
             if (!Directory.Exists(rootTestDir))
