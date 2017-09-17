@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics;
 using CapuchinSync.Core.Interfaces;
 
 namespace CapuchinSync.Core
