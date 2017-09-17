@@ -17,7 +17,7 @@ namespace CapuchinSync.Core
             Error,
             Fatal
         }
-
+       
         public LogEntry(Type logSourceType, LogSeverity severity, string message, Exception e = null)
         {
             EntryDate = DateTimeProvider.Now;
