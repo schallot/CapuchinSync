@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using CapuchinSync.Core;
 using CapuchinSync.Core.DirectorySynchronization;
@@ -14,6 +15,8 @@ namespace CapuchinSync
 
         public static int Main(string[] args)
         {
+            var stopWatch = new Stopwatch();
+            stopWatch.Start();
             var fileSystem = new FileSystem();
             var pathUtility = new PathUtility();
             var hashUtility = new Sha1Hash();
@@ -58,7 +61,7 @@ namespace CapuchinSync
                 logViewer = new TextFileLogViewer(pathUtility, fileSystem, processStarter);
             }
             var syncher = new DirectorySyncher(new FileSystem(), pathUtility, fileCopierFactory, logViewer);
-            return syncher.Synchronize(hashesToVerify);
+            return syncher.Synchronize(hashesToVerify, stopWatch);
         }
     }
 }

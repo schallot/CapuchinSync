@@ -25,7 +25,7 @@ namespace CapuchinSync.Core.Hashes
             _fileSystem = fileSystem;
             _hashEntryFactory = hashEntryFactory ?? throw new ArgumentNullException(nameof(hashEntryFactory));
             _dictionaryFile = pathUtility.Combine(rootDirectory, Constants.HashFileName);
-            Info($"Creating hash dictionary reader for file {Constants.HashFileName} in directory {rootDirectory}");
+            Debug($"Creating hash dictionary reader for file {Constants.HashFileName} in directory {rootDirectory}");
         }
 
         public HashDictionary Read()

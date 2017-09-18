@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using CapuchinSync.Core.Interfaces;
@@ -22,12 +23,16 @@ namespace CapuchinSync.Core.DirectorySynchronization
             _fileCopierFactory = fileCopierFactory;
         }
 
-        public int Synchronize(IEnumerable<IHashVerifier> hashesToVerify)
+        public int Synchronize(IEnumerable<IHashVerifier> hashesToVerify, Stopwatch stopwatch = null)
         {
+            if (stopwatch == null)
+            {
+                stopwatch = new Stopwatch();
+                stopwatch.Start();
+            }
             var hashGroups = hashesToVerify
                 .GroupBy(x => x.GetHashEntry().Hash).Select(x => x.ToArray()).ToArray();
             _filesExamined = hashGroups.Sum(x => x.Length);
-
             int copies = 0;
 
             // Each group contains all files that match a particular hash.  This will let us limit the copying of a 
@@ -39,7 +44,8 @@ namespace CapuchinSync.Core.DirectorySynchronization
                     copies += ProcessHashGrouping(group);
                 });
 
-            Info($"Finished synchronization of {_filesExamined} files after {copies} file copies.");
+            stopwatch.Stop();
+            Info($"Finished synchronization of {_filesExamined} files after {copies} file copies in {(int)(stopwatch.ElapsedMilliseconds/1000f)} seconds.");
             _logViewer?.ViewLogs(AllLogEntries);
             return 0;
         }
