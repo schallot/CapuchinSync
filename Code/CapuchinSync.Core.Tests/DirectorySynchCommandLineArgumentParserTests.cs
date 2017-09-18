@@ -14,7 +14,7 @@ namespace CapuchinSync.Core.Tests
             {
                 "source:C:\\temp1;destination:C:\\temp2"
             };
-            var parser = new DirectorySynchCommandLineArgumentParser(args, new LoggingLevelCommandLineParser());
+            var parser = new DirectorySynchCommandLineArgumentParser(args);
 
             Assert.AreEqual(0, parser.ErrorNumber, "Unexpected error number");
             Assert.AreEqual(1, parser.DirectorySynchArguments.Count, "Expected 1 arguments in our result");
@@ -33,7 +33,7 @@ namespace CapuchinSync.Core.Tests
                 "source:C:\\temp3;destination:C:\\temp4",
                 "source:C:\\temp5;destination:C:\\temp6"
             };
-            var parser = new DirectorySynchCommandLineArgumentParser(args, new LoggingLevelCommandLineParser());
+            var parser = new DirectorySynchCommandLineArgumentParser(args);
 
             Assert.AreEqual(0, parser.ErrorNumber, "Unexpected error number");
             Assert.AreEqual(3, parser.DirectorySynchArguments.Count, "Expected 3 arguments in our result");
@@ -51,7 +51,7 @@ namespace CapuchinSync.Core.Tests
         [Test]
         public void ShouldComplainAboutNullArgument()
         {
-            var parser = new DirectorySynchCommandLineArgumentParser(null, new LoggingLevelCommandLineParser());
+            var parser = new DirectorySynchCommandLineArgumentParser(null);
             Assert.AreEqual(DirectorySynchCommandLineArgumentParser.ErrorCodes.NoArgumentsProvided, 
                 parser.ErrorNumber, "Unexpected error number");
         }
@@ -59,7 +59,7 @@ namespace CapuchinSync.Core.Tests
         [Test]
         public void ShouldComplainAboutEmptyArgument()
         {
-            var parser = new DirectorySynchCommandLineArgumentParser(new string[] {}, new LoggingLevelCommandLineParser());
+            var parser = new DirectorySynchCommandLineArgumentParser(new string[] {});
             Assert.AreEqual(DirectorySynchCommandLineArgumentParser.ErrorCodes.NoArgumentsProvided,
                 parser.ErrorNumber, "Unexpected error number");
         }
@@ -71,7 +71,7 @@ namespace CapuchinSync.Core.Tests
             {
                 "source:C:\\temp1;destination:C:\\temp2;whatever:blah"
             };
-            var parser = new DirectorySynchCommandLineArgumentParser(args, new LoggingLevelCommandLineParser());
+            var parser = new DirectorySynchCommandLineArgumentParser(args);
 
             Assert.AreEqual(DirectorySynchCommandLineArgumentParser.ErrorCodes.ArgumentSplitToInvalidNumberOfParts, 
                 parser.ErrorNumber, "Unexpected error number");
@@ -84,7 +84,7 @@ namespace CapuchinSync.Core.Tests
             {
                 "whatever:C:\\temp1;destination:C:\\temp2"
             };
-            var parser = new DirectorySynchCommandLineArgumentParser(args, new LoggingLevelCommandLineParser());
+            var parser = new DirectorySynchCommandLineArgumentParser(args);
 
             Assert.AreEqual(DirectorySynchCommandLineArgumentParser.ErrorCodes.ArgumentDoesNotStartWithSource,
                 parser.ErrorNumber, "Unexpected error number");
@@ -97,7 +97,7 @@ namespace CapuchinSync.Core.Tests
             {
                 "source:C:\\temp1;whatever:C:\\temp2"
             };
-            var parser = new DirectorySynchCommandLineArgumentParser(args, new LoggingLevelCommandLineParser());
+            var parser = new DirectorySynchCommandLineArgumentParser(args);
 
             Assert.AreEqual(DirectorySynchCommandLineArgumentParser.ErrorCodes.ArgumentDoesNotHaveDestinationComponentInSecondPosition,
                 parser.ErrorNumber, "Unexpected error number");
@@ -111,7 +111,7 @@ namespace CapuchinSync.Core.Tests
             {
                 ";;source:C:\\temp1;;;;;destination:C:\\temp2;;;"
             };
-            var parser = new DirectorySynchCommandLineArgumentParser(args, new LoggingLevelCommandLineParser() );
+            var parser = new DirectorySynchCommandLineArgumentParser(args );
 
             Assert.AreEqual(0, parser.ErrorNumber, "Unexpected error number");
             Assert.AreEqual(1, parser.DirectorySynchArguments.Count, "Expected 1 arguments in our result");

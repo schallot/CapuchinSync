@@ -14,12 +14,12 @@ namespace CapuchinSync.Core.DirectorySynchronization
             public const int ArgumentSplitToInvalidNumberOfParts = 667;
             public const int ArgumentDoesNotStartWithSource = 668;
             public const int ArgumentDoesNotHaveDestinationComponentInSecondPosition = 669;
-            public const int InvalidLoggingThreshold = 670;
+            //public const int InvalidLoggingThreshold = 670;
         }
 
         public int ErrorNumber { get; private set; }
 
-        public DirectorySynchCommandLineArgumentParser(IEnumerable<string> commandLineArgs, LoggingLevelCommandLineParser loggingLevelParser)
+        public DirectorySynchCommandLineArgumentParser(IEnumerable<string> commandLineArgs)
         {
             var args = new List<string>();
             if(commandLineArgs != null) args.AddRange(commandLineArgs);
@@ -31,9 +31,6 @@ namespace CapuchinSync.Core.DirectorySynchronization
                 ErrorNumber = ErrorCodes.NoArgumentsProvided;
                 return;
             }
-
-            args = loggingLevelParser.SetLoggingLevelAndReturnNonLoggingArgs(args);
-
             Info($"Received {args.Count} command line arguments: [<{string.Join(">,<",args)}>]");
             
             DirectorySynchArguments = new List<IDirectorySynchArgument>();

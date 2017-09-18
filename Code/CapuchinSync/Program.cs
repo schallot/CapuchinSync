@@ -15,7 +15,9 @@ namespace CapuchinSync
             var pathUtility = new PathUtility();
             var hashUtility = new Sha1Hash();
             var fileCopierFactory = new FileCopierFactory(fileSystem, pathUtility);
-            var parser = new DirectorySynchCommandLineArgumentParser(args, new LoggingLevelCommandLineParser());
+            var loggingCommandParser = new LoggingLevelCommandLineParser();
+            args = loggingCommandParser.SetLoggingLevelAndReturnNonLoggingArgs(args).ToArray();
+            var parser = new DirectorySynchCommandLineArgumentParser(args);
             if (parser.ErrorNumber != 0)
             {
                 Console.WriteLine($"Failed to parse command line arguments.  Returning error code {parser.ErrorNumber}.");
