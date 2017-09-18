@@ -111,7 +111,7 @@ namespace CapuchinSync.Core.Tests
             {
                 ";;source:C:\\temp1;;;;;destination:C:\\temp2;;;"
             };
-            var parser = new DirectorySynchCommandLineArgumentParser(args);
+            var parser = new DirectorySynchCommandLineArgumentParser(args );
 
             Assert.AreEqual(0, parser.ErrorNumber, "Unexpected error number");
             Assert.AreEqual(1, parser.DirectorySynchArguments.Count, "Expected 1 arguments in our result");

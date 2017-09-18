@@ -36,6 +36,9 @@ namespace CapuchinSync.Core
             return Directory.CreateDirectory(path).Exists;
         }
 
+        private static object FileCopyCountLock = new object();
+        public static int FileCopyCount = 0;
+
         /// <summary>
         /// Copies a file from <see cref="sourcePath" /> to <see cref="targetPath" />.
         /// If a file already exists at <see cref="targetPath" />, it is overwritten.
@@ -45,6 +48,10 @@ namespace CapuchinSync.Core
         public void CopyFileAndOverwriteIfItExists(string sourcePath, string targetPath)
         {
             File.Copy(sourcePath, targetPath, true);
+            lock (FileCopyCountLock)
+            {
+                FileCopyCount++;
+            }
         }
 
         /// <summary>

@@ -36,7 +36,7 @@ namespace CapuchinSync.Core.GenerateSynchronizationDictionary
                 return;
             }
             Debug($"Received {args.Count} command line arguments: [<{string.Join(">,<", args)}>]");
-
+            
             var directory = args.First();
             if (!fileSystem.DoesDirectoryExist(directory))
             {

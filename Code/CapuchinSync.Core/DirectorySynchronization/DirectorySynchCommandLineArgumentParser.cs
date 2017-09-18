@@ -9,10 +9,12 @@ namespace CapuchinSync.Core.DirectorySynchronization
     {
         public static class ErrorCodes
         {
+            public const int InvalidArgumentsProvided = 665;
             public const int NoArgumentsProvided = 666;
             public const int ArgumentSplitToInvalidNumberOfParts = 667;
             public const int ArgumentDoesNotStartWithSource = 668;
             public const int ArgumentDoesNotHaveDestinationComponentInSecondPosition = 669;
+            //public const int InvalidLoggingThreshold = 670;
         }
 
         public int ErrorNumber { get; private set; }
@@ -21,15 +23,16 @@ namespace CapuchinSync.Core.DirectorySynchronization
         {
             var args = new List<string>();
             if(commandLineArgs != null) args.AddRange(commandLineArgs);
+
             if (!args.Any())
             {
-                Error("No arguments were supplied.  Arguments should be supplied in the form of" +
-                      $"\r\nsource:PATHTOSOURCEDIR;destination:PATHTODESTINATIONDIR [...].  Exiting with code {ErrorCodes.NoArgumentsProvided}.");
+                Error("No synchronization arguments were supplied.  Arguments should be supplied in the form of" +
+                      $"\r\nsource:PATHTOSOURCEDIR;destination:PATHTODESTINATIONDIR [...] [verbosity:<LoggingVerbosityLevel>].  Exiting with code {ErrorCodes.NoArgumentsProvided}.");
                 ErrorNumber = ErrorCodes.NoArgumentsProvided;
                 return;
             }
             Info($"Received {args.Count} command line arguments: [<{string.Join(">,<",args)}>]");
-
+            
             DirectorySynchArguments = new List<IDirectorySynchArgument>();
             foreach (var commandLineArg in args)
             {
@@ -37,13 +40,18 @@ namespace CapuchinSync.Core.DirectorySynchronization
                 if (arg == null)
                 {
                     Error($"Invalid command line arguments were provided.  Exiting with code {ErrorNumber}.");
+                    if (ErrorNumber.IsReturnCodeJustPeachy())
+                    {
+                        // Set a generic error code if a more specific one wasn't set earlier.
+                        ErrorNumber = ErrorCodes.InvalidArgumentsProvided;
+                    }
                     return;
                 }
                 DirectorySynchArguments.Add(arg);
             }
         }
 
-        private IDirectorySynchArgument ParseCommandlineArg(string arg)
+        private DirectorySynchArgument ParseCommandlineArg(string arg)
         {
             Debug($"Parsing command line arg <{arg}>");
             // Args are of format source:PATHTOSOURCEDIR;destination:PATHTODESTINATIONDIR

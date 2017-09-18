@@ -76,6 +76,7 @@
     <Compile Include="Interfaces\ILogViewer.cs" />
     <Compile Include="Interfaces\IPathUtility.cs" />
     <Compile Include="Interfaces\IProcessStarter.cs" />
+    <Compile Include="LoggingLevelCommandLineParser.cs" />
     <Compile Include="ProcessStarter.cs" />
     <Compile Include="TextFileLogViewer.cs" />
     <Compile Include="LogEntry.cs" />

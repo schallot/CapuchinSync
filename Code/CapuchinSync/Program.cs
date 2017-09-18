@@ -1,20 +1,35 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using CapuchinSync.Core;
 using CapuchinSync.Core.DirectorySynchronization;
 using CapuchinSync.Core.Hashes;
+using CapuchinSync.Core.Interfaces;
 
 namespace CapuchinSync
 {
     public class Program : Loggable
     {
+        public const string OpenLogInEditorCommand = "openLogInEditor";
+
         public static int Main(string[] args)
         {
+            var stopWatch = new Stopwatch();
+            stopWatch.Start();
             var fileSystem = new FileSystem();
             var pathUtility = new PathUtility();
             var hashUtility = new Sha1Hash();
             var fileCopierFactory = new FileCopierFactory(fileSystem, pathUtility);
+            var loggingCommandParser = new LoggingLevelCommandLineParser();
+            args = loggingCommandParser.SetLoggingLevelAndReturnNonLoggingArgs(args).ToArray();
+            bool openLogInTextEditor = false;
+            if (args.Any(x => OpenLogInEditorCommand.Equals(x, StringComparison.InvariantCultureIgnoreCase)))
+            {
+                openLogInTextEditor = true;
+                args = args.Where(x=>!OpenLogInEditorCommand.Equals(x, StringComparison.InvariantCultureIgnoreCase)).ToArray();
+            }
+
             var parser = new DirectorySynchCommandLineArgumentParser(args);
             if (parser.ErrorNumber != 0)
             {
@@ -39,11 +54,14 @@ namespace CapuchinSync
                 hashesToVerify.AddRange(dictionary.Entries.Select(y => new HashVerifier(y, argument.TargetDirectory, fileSystem, pathUtility, hashUtility)));
             }
             var processStarter = new ProcessStarter();
-            var logViewer = new TextFileLogViewer(pathUtility, fileSystem, processStarter);
+
+            ILogViewer logViewer = null;
+            if (openLogInTextEditor)
+            {
+                logViewer = new TextFileLogViewer(pathUtility, fileSystem, processStarter);
+            }
             var syncher = new DirectorySyncher(new FileSystem(), pathUtility, fileCopierFactory, logViewer);
-            return syncher.Synchronize(hashesToVerify);
+            return syncher.Synchronize(hashesToVerify, stopWatch);
         }
-
-
     }
 }

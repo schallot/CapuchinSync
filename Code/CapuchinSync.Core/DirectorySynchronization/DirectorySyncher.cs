@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using CapuchinSync.Core.Interfaces;
@@ -22,31 +23,31 @@ namespace CapuchinSync.Core.DirectorySynchronization
             _fileCopierFactory = fileCopierFactory;
         }
 
-        public int Synchronize(IEnumerable<IHashVerifier> hashesToVerify)
+        public int Synchronize(IEnumerable<IHashVerifier> hashesToVerify, Stopwatch stopwatch = null)
         {
+            if (stopwatch == null)
+            {
+                stopwatch = new Stopwatch();
+                stopwatch.Start();
+            }
             var hashGroups = hashesToVerify
                 .GroupBy(x => x.GetHashEntry().Hash).Select(x => x.ToArray()).ToArray();
             _filesExamined = hashGroups.Sum(x => x.Length);
-
-            int copies = 0;
-
+            
             // Each group contains all files that match a particular hash.  This will let us limit the copying of a 
             // files with that hash to at most once over the network, with all subsequent copies happening locally
             Parallel.ForEach(hashGroups,
                 new ParallelOptions { MaxDegreeOfParallelism = 6 },
-                group =>
-                {
-                    copies += ProcessHashGrouping(group);
-                });
+                ProcessHashGrouping);
 
-            Info($"Finished synchronization of {_filesExamined} files after {copies} file copies.");
+            stopwatch.Stop();
+            Info($"Finished synchronization of {_filesExamined} files after {FileSystem.FileCopyCount} file copies in {(int)(stopwatch.ElapsedMilliseconds/1000f)} seconds.");
             _logViewer?.ViewLogs(AllLogEntries);
             return 0;
         }
 
-        private int ProcessHashGrouping(IHashVerifier[] group)
+        private void ProcessHashGrouping(IHashVerifier[] group)
         {
-            int copies = 0;
             var matchingHashes = group.Where(x => x.Status == HashVerifier.VerificationStatus.TargetFileMatchesHash).ToList();
             var misMatches = group.Where(x =>
                 x.Status == HashVerifier.VerificationStatus.TargetFileDoesNotMatchHash
@@ -64,7 +65,6 @@ namespace CapuchinSync.Core.DirectorySynchronization
                 var copier = _fileCopierFactory.CreateFileCopier(firstMisMatch.FullSourcePath, firstMisMatch.FullTargetPath);
                 copier.PerformCopy();
                 matchingHashes.Add(firstMisMatch);
-                copies++;
             }
 
             // We know at this point that we have at least one file with our hash on our local folder, so we can use it for
@@ -78,10 +78,8 @@ namespace CapuchinSync.Core.DirectorySynchronization
                     var copier =
                         _fileCopierFactory.CreateFileCopier(firstMatch.FullTargetPath, mismatch.FullTargetPath);
                     copier.PerformCopy();
-                    copies++;
                 }
             }
-            return copies;
         }
     }
 }

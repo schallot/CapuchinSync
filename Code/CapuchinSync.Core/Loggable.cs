@@ -7,6 +7,7 @@ namespace CapuchinSync.Core
 {
     public abstract class Loggable : ILoggable
     {
+        public static LogEntry.LogSeverity LogThreshold { get; set; } = LogEntry.LogSeverity.Info;
         public static List<ILogEntry> AllLogEntries { get; } = new List<ILogEntry>();
 
         public static void WriteAllLogEntriesToFile(string path, IFileSystem fileSystem)
@@ -49,8 +50,9 @@ namespace CapuchinSync.Core
         private void CreateEntry(string message, LogEntry.LogSeverity severity, Exception e = null)
         {
             var entry = new LogEntry(GetType(),severity, message, e);
-            LogEntries.Add(entry);
             AllLogEntries.Add(entry);
+            LogEntries.Add(entry);
+            if (severity < LogThreshold) return;
             WriteToConsole(entry);
         }
 
