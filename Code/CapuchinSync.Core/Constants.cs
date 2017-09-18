@@ -8,6 +8,11 @@
         public const string HashFileName = ".capuchinSync";
 
         /// <summary>
+        /// The name of the hash file that will be copied to before an existing hash file is overwritten.
+        /// </summary>
+        public const string BackupHashFileName = HashFileName + ".old";
+
+        /// <summary>
         /// A return code that indicates that everything worked as expected.
         /// </summary>
         public const int EverythingsJustPeachyReturnCode = 0;

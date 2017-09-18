@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CapuchinSync.Core.Interfaces;
@@ -17,7 +18,6 @@ namespace CapuchinSync.Core.GenerateSynchronizationDictionary
             Stopwatch watch = new Stopwatch();
             watch.Restart();
             var rootDir = arguments.RootDirectory;
-            var hashFile = Constants.HashFileName;
 
             // Because the actual enumeration of the filesystem happens at the evaluation of the
             // return of EnumerateFilesInDirectory, we need to look for file system errors at the 
@@ -28,9 +28,9 @@ namespace CapuchinSync.Core.GenerateSynchronizationDictionary
                 Parallel.ForEach(allFiles, file =>
                 {
                     FileCount++;
-                    // there's no point in recording the hash of the list of hashes.
-                    if (file.EndsWith(hashFile, StringComparison.CurrentCultureIgnoreCase) && hashFile.Equals(pathUtility.GetFileName(file),
-                        StringComparison.InvariantCultureIgnoreCase)) return;
+                    // there's no point in recording the hash of the list of hashes, or the backup version of this file.
+                    if(IsFileNameAMatch(file, Constants.HashFileName, pathUtility)
+                        || IsFileNameAMatch(file, Constants.BackupHashFileName, pathUtility)) return;
                     var hasher = hasherFactory.CreateHasher(file);
                     hashes.Add(hasher);
                 });
@@ -40,12 +40,12 @@ namespace CapuchinSync.Core.GenerateSynchronizationDictionary
                 throw new Exception($"Enumeration of directory {rootDir} failed: {e.InnerException?.Message}", e);
             }
 
-            HashDictionaryFilepath = pathUtility.Combine(rootDir, hashFile);
+            HashDictionaryFilepath = pathUtility.Combine(rootDir, Constants.HashFileName);
             var backupLocation = HashDictionaryFilepath + ".old";
             StringBuilder sb = new StringBuilder();
             var now = dateTimeProvider.Now;
             sb.AppendLine($"{hashes.Count} files found in {rootDir} on {dateTimeProvider.GetDateString(now)} at {dateTimeProvider.GetTimeString(now)}");
-            foreach (var hash in hashes)
+            foreach (var hash in hashes.OrderBy(x=>x.RelativePath))
             {
                 sb.AppendLine(hash.DictionaryEntryString);
             }
@@ -65,6 +65,12 @@ namespace CapuchinSync.Core.GenerateSynchronizationDictionary
 
             watch.Stop();
             Info($"Finished processing {FileCount} files in {watch.ElapsedMilliseconds / 1000d} seconds.");
+        }
+
+        private bool IsFileNameAMatch(string fullPath, string fileName, IPathUtility pathUtility)
+        {
+            return (fullPath.EndsWith(fileName, StringComparison.CurrentCultureIgnoreCase) && fileName.Equals(pathUtility.GetFileName(fullPath),
+                    StringComparison.InvariantCultureIgnoreCase));
         }
 
         /// <summary>
