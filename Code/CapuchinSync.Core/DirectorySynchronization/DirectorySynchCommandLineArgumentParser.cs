@@ -32,7 +32,7 @@ namespace CapuchinSync.Core.DirectorySynchronization
                 return;
             }
 
-            args = loggingLevelParser.SetLoggingLevelAndReturnNonLoggingArgs(args).ToList();
+            args = loggingLevelParser.SetLoggingLevelAndReturnNonLoggingArgs(args);
 
             Info($"Received {args.Count} command line arguments: [<{string.Join(">,<",args)}>]");
             
@@ -43,7 +43,11 @@ namespace CapuchinSync.Core.DirectorySynchronization
                 if (arg == null)
                 {
                     Error($"Invalid command line arguments were provided.  Exiting with code {ErrorNumber}.");
-                    ErrorNumber = ErrorCodes.InvalidArgumentsProvided;
+                    if (ErrorNumber.IsReturnCodeJustPeachy())
+                    {
+                        // Set a generic error code if a more specific one wasn't set earlier.
+                        ErrorNumber = ErrorCodes.InvalidArgumentsProvided;
+                    }
                     return;
                 }
                 DirectorySynchArguments.Add(arg);

@@ -14,9 +14,9 @@ namespace CapuchinSync.Core
             return arg.StartsWith(VerbosityPrefix);
         }
 
-        public string[] SetLoggingLevelAndReturnNonLoggingArgs(IEnumerable<string> args)
+        public List<string> SetLoggingLevelAndReturnNonLoggingArgs(IEnumerable<string> args)
         {
-            var argArray = args.ToArray();
+            var argArray = args.ToList();
             if (!argArray.Any(IsVerbosityArgument))
             {
                 LogThreshold = LogEntry.LogSeverity.Info;
@@ -25,7 +25,7 @@ namespace CapuchinSync.Core
             }
             LogThreshold = GetVerbosityArgument(argArray.First(IsVerbosityArgument));
             Info($"Set logging verbosity threshold to {LogThreshold}");
-            return argArray.Where(x => !IsVerbosityArgument(x)).ToArray();
+            return argArray.Where(x => !IsVerbosityArgument(x)).ToList();
         }
 
         private LogEntry.LogSeverity GetVerbosityArgument(string arg)

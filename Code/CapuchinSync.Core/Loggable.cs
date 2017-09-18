@@ -51,6 +51,7 @@ namespace CapuchinSync.Core
         {
             var entry = new LogEntry(GetType(),severity, message, e);
             AllLogEntries.Add(entry);
+            LogEntries.Add(entry);
             if (severity < LogThreshold) return;
             WriteToConsole(entry);
         }

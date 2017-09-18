@@ -17,7 +17,7 @@ namespace CapuchinSync.Core.GenerateSynchronizationDictionary
         public int ErrorNumber { get; }
         public const string ExcludeFilePrefix = "XF:";
 
-        public GenerateSyncHashesCommandLineArgumentParser(string[] commandLineArgs, IFileSystem fileSystem)
+        public GenerateSyncHashesCommandLineArgumentParser(string[] commandLineArgs, IFileSystem fileSystem, LoggingLevelCommandLineParser loggingCommandParser)
         {
             string exampleArguments = "Arguments should be supplied in the form of" +
                                             $"\r\n\t<Directory> [{ExcludeFilePrefix}<FileExcludePattern> ...]" +
@@ -36,6 +36,7 @@ namespace CapuchinSync.Core.GenerateSynchronizationDictionary
                 return;
             }
             Debug($"Received {args.Count} command line arguments: [<{string.Join(">,<", args)}>]");
+            args = loggingCommandParser.SetLoggingLevelAndReturnNonLoggingArgs(args);
 
             var directory = args.First();
             if (!fileSystem.DoesDirectoryExist(directory))

@@ -16,7 +16,7 @@ namespace CapuchinSync.Hash
         private int Run(string[] args)
         {
             var fileSystem = new FileSystem();
-            var parser = new GenerateSyncHashesCommandLineArgumentParser(args, fileSystem);
+            var parser = new GenerateSyncHashesCommandLineArgumentParser(args, fileSystem, new LoggingLevelCommandLineParser());
             if (!parser.ErrorNumber.IsReturnCodeJustPeachy())
             {
                 Error($"Command line parser returned error code {parser.ErrorNumber}.");
