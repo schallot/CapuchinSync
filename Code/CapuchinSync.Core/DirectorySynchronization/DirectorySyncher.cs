@@ -52,7 +52,17 @@ namespace CapuchinSync.Core.DirectorySynchronization
                 ProcessHashGrouping);
 
             stopwatch.Stop();
-            Info($"Finished synchronization of {_filesExamined} files after {FileSystem.FileCopyCount} file copies in {(int)(stopwatch.ElapsedMilliseconds/1000f)} seconds.");
+            if (FileSystem.FileCopyErrorCount == 0)
+            {
+                Info($"Successfully synchronized {_filesExamined} files after {FileSystem.FileCopyCount} file" +
+                     $" copies in {(int) (stopwatch.ElapsedMilliseconds / 1000f)} seconds.");
+            }
+            else
+            {
+                Error($"Successfully synchronized {_filesExamined} files after {FileSystem.FileCopyCount} file" +
+                     $" copies with {FileSystem.FileCopyErrorCount} failed copies" +
+                     $" in {(int)(stopwatch.ElapsedMilliseconds / 1000f)} seconds.");
+            }
             _logViewer?.ViewLogs(AllLogEntries);
             return 0;
         }

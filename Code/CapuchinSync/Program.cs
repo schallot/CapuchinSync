@@ -36,6 +36,7 @@ namespace CapuchinSync
             if (!string.IsNullOrWhiteSpace(maxParallelArg))
             {
                 int.TryParse(maxParallelArg.Substring(MaxParallelCopiesCommand.Length), out maxParallelCopies);
+                args = args.Where(x => !x.StartsWith(MaxParallelCopiesCommand, StrComp)).ToArray();
             }
 
             var parser = new DirectorySynchCommandLineArgumentParser(args);
@@ -58,6 +59,7 @@ namespace CapuchinSync
                 if (reader.ErrorCode != 0)
                 {
                     Console.WriteLine($"Failed to read hash dictionary for directory {argument.SourceDirectory}.  Returning error code {reader.ErrorCode}.");
+                    return reader.ErrorCode;
                 }
                 hashesToVerify.AddRange(dictionary.Entries.Select(y => new HashVerifier(y, argument.TargetDirectory, fileSystem, pathUtility, hashUtility)));
             }
