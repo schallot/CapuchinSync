@@ -18,7 +18,7 @@ namespace CapuchinSync.Core.Tests.FunctionalTests
                     FileSystem, PathUtility, HashUtility
                 )).ToList();
 
-            var syncher = new DirectorySyncher(FileSystem, PathUtility, FileCopierFactory);
+            var syncher = new DirectorySyncher(FileSystem, PathUtility, FileCopierFactory, 8);
             syncher.Synchronize(sets);
 
             var expectedFiles = TestSet1.Select(x => new
