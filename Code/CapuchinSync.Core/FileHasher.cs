@@ -6,16 +6,13 @@ namespace CapuchinSync.Core
 {
     public class FileHasher : Loggable, IFileHasher
     {
-        public FileHasher(IHashUtility hashUtility, string rootDirectory, string path)
+        public FileHasher(IHashUtility hashUtility, IPathUtility pathUtility, string path)
         {
             if(hashUtility == null) throw new ArgumentNullException(nameof(hashUtility));
-            Trace($"Creating instance of {nameof(FileHasher)} with hash <{hashUtility.HashName}> for path {path} in directory {rootDirectory}.");
-            RelativePath = path.Substring(rootDirectory.Length);
-            if (RelativePath.StartsWith("/") || RelativePath.StartsWith("\\"))
-            {
-                RelativePath = RelativePath.Substring(1);
-            }
-            Debug($"Relative path for file {path} calculated as {RelativePath} in directory {rootDirectory}.");
+            if(pathUtility == null) throw new ArgumentException(nameof(pathUtility));
+            _pathUtility = pathUtility;
+            FullPath = path;
+            Trace($"Creating instance of {nameof(FileHasher)} with hash <{hashUtility.HashName}> for path {path}.");
             try
             {
                 Hash = hashUtility.GetHashFromFile(path);
@@ -28,10 +25,16 @@ namespace CapuchinSync.Core
             Info($"Calculated hash for file {path} as {Hash}.");
         }
 
-        public string RelativePath { get; }
-
+        private readonly IPathUtility _pathUtility;
+        public string FullPath { get; }
         public string Hash { get; }
 
-        public string DictionaryEntryString => $"{Hash}{HashDictionaryEntry.Delimiter}{RelativePath}";
+
+
+        public string GetDictionaryEntryString(string rootDirectory)
+        {
+            var relativePath = _pathUtility.CalculateRelativePath(rootDirectory, FullPath);
+            return $"{Hash}{HashDictionaryEntry.Delimiter}{relativePath}";
+        }
     }
 }

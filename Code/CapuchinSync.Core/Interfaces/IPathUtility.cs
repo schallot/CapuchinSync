@@ -30,5 +30,23 @@
         /// <param name="path">The path.</param>
         /// <returns></returns>
         string GetFileName(string path);
+
+        /// <summary>
+        /// Given two directories, returns true if the second is a subdirectory of the first, or if the two are the same directory.
+        /// </summary>
+        /// <param name="directoryFullPath">The directory full path.</param>
+        /// <param name="possibleSubPathFullPath">The possible sub directory full path.</param>
+        /// <returns>
+        ///   <c>true</c> if [is sub directory of] [the specified directory full path]; otherwise, <c>false</c>.
+        /// </returns>
+        bool IsSubPathOrEqualTo(string directoryFullPath, string possibleSubPathFullPath);
+
+        /// <summary>
+        /// Calculates the relative path between a file and a directory.
+        /// </summary>
+        /// <param name="rootDirectory">The root directory.</param>
+        /// <param name="fileFullPath">The file full path.</param>
+        /// <returns></returns>
+        string CalculateRelativePath(string rootDirectory, string fileFullPath);
     }
 }

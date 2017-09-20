@@ -20,8 +20,8 @@ namespace CapuchinSync.Core.GenerateSynchronizationDictionary
         public GenerateSyncHashesCommandLineArgumentParser(string[] commandLineArgs, IFileSystem fileSystem)
         {
             string exampleArguments = "Arguments should be supplied in the form of" +
-                                            $"\r\n\t<Directory> [{ExcludeFilePrefix}<FileExcludePattern> ...]" +
-                                            $"\r\n\tFor example, <C:\\Directory1 {ExcludeFilePrefix}*.pdb {ExcludeFilePrefix}*.suo>.";           
+                                            $"\r\n\t<Directory> [AdditionalDirectory1 ...] [{ExcludeFilePrefix}<FileExcludePattern> ...]" +
+                                            $"\r\n\tFor example, <C:\\Directory1 C:\\Directory2 {ExcludeFilePrefix}*.pdb {ExcludeFilePrefix}*.suo>.";           
 
             var args = new List<string>();
             if (commandLineArgs != null) {
@@ -37,22 +37,24 @@ namespace CapuchinSync.Core.GenerateSynchronizationDictionary
             }
             Debug($"Received {args.Count} command line arguments: [<{string.Join(">,<", args)}>]");
             
-            var directory = args.First();
-            if (!fileSystem.DoesDirectoryExist(directory))
+            var directories = args.Where(x=> !x.StartsWith(ExcludeFilePrefix, StringComparison.InvariantCultureIgnoreCase)).ToArray();
+            args = args.Where(x => !directories.Contains(x)).ToList();
+
+            var nonExistentDirectories = directories.Where(x => !fileSystem.DoesDirectoryExist(x)).ToArray();
+            if (nonExistentDirectories.Any())
             {
-                Error($"Directory <{directory}> does not exist.");
+                Error($"The following ({nonExistentDirectories.Length}) Directories do not exist: {string.Join(", ", nonExistentDirectories)}");
                 ErrorNumber = ErrorCodes.DirectoryDoesNotExist;
                 return;
             }
             
-            args.RemoveAt(0);
-
             var excludeArgs = args.Where(x => x.StartsWith(ExcludeFilePrefix, StringComparison.InvariantCultureIgnoreCase))
                 .Select(x=>x.Substring(ExcludeFilePrefix.Length)
                     .Trim()
                     .Trim('.','*') // We'll get rid of any *'s or .'s in the extensions to normalize things.
                     .Trim())
                 .ToArray();
+
             args = args.Where(x => !x.StartsWith(ExcludeFilePrefix, StringComparison.InvariantCultureIgnoreCase)).ToList();
 
             if (args.Any())
@@ -61,7 +63,7 @@ namespace CapuchinSync.Core.GenerateSynchronizationDictionary
                 ErrorNumber = ErrorCodes.UnrecognizedArgument;
                 return;
             }            
-            Arguments = new GenerateSyncHashesArguments {RootDirectory = directory, ExtensionsToExclude = excludeArgs};            
+            Arguments = new GenerateSyncHashesArguments {RootDirectories = directories, ExtensionsToExclude = excludeArgs};            
             Info($"Received arguments {Arguments}");
         }
 

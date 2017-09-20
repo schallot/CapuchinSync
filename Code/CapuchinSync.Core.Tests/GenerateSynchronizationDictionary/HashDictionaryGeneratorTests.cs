@@ -35,7 +35,7 @@ namespace CapuchinSync.Core.Tests.GenerateSynchronizationDictionary
         {
             _filesWritten = new List<Tuple<string, string>>();
             Files = new List<string>{File1, File2};
-            _arguments = new GenerateSyncHashesArguments {RootDirectory = TestRootDir};
+            _arguments = new GenerateSyncHashesArguments {RootDirectories = new []{TestRootDir}};
             _fileSystem = Substitute.For<IFileSystem>();
             _fileSystem.EnumerateFilesInDirectory(TestRootDir).Returns(Files);
             _fileSystem.When(x=>x.WriteAsUtf8TextFile(Arg.Any<string>(), Arg.Any<string>())).Do(y =>
@@ -53,11 +53,11 @@ namespace CapuchinSync.Core.Tests.GenerateSynchronizationDictionary
             _pathUtility.GetFileName(Arg.Any<string>()).Returns(x => Path.GetFileName(x[0] as string));
 
             var firstHasher = Substitute.For<IFileHasher>();
-            firstHasher.DictionaryEntryString.Returns(File1DictionaryEntry);
-            firstHasher.RelativePath.Returns(File1);
+            firstHasher.GetDictionaryEntryString(Arg.Any<string>()).Returns(File1DictionaryEntry);
+            firstHasher.FullPath.Returns(File1);
             var secondHasher = Substitute.For<IFileHasher>();
-            secondHasher.DictionaryEntryString.Returns(File2DictionaryEntry);
-            firstHasher.RelativePath.Returns(File2);
+            secondHasher.GetDictionaryEntryString(Arg.Any<string>()).Returns(File2DictionaryEntry);
+            firstHasher.FullPath.Returns(File2);
 
             _fileHasherFactory = Substitute.For<IFileHasherFactory>();
             _fileHasherFactory.CreateHasher(File1).Returns(firstHasher);
