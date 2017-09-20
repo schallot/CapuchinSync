@@ -26,6 +26,7 @@ namespace CapuchinSync.Core.Tests.DirectorySynchronization
         private TestFileCopier _mismatchedVerifierCopier1;
         private TestFileCopier _mismatchedVerifierCopier2;
         private TestFileCopier _missingTargetVerifierCopier;
+        private int _maxParallelCopies = 8;
 
         private const string RootSourcePath = "C:\\source";
         private const string RootTargetPath = "D:\\target";
@@ -150,7 +151,7 @@ namespace CapuchinSync.Core.Tests.DirectorySynchronization
         public void Synchronize_ExpectAllUnverifiedFilesToBeCopiedOver()
         {
             var synchronizer =
-                new DirectorySyncher(_fileSystem, _pathUtility, _fileCopierFactory);
+                new DirectorySyncher(_fileSystem, _pathUtility, _fileCopierFactory, _maxParallelCopies);
             synchronizer.Synchronize(_verifiers);
          
             Assert.IsTrue(_mismatchedVerifierCopier1.PerformCopyWasCalled, "Expected mismatched verifier 1 to result in a file copy");
@@ -185,19 +186,19 @@ namespace CapuchinSync.Core.Tests.DirectorySynchronization
         [Test]
         public void ConstructorTest_ShouldThrowArgumentNullExceptionWithNullFileSystem()
         {
-            Assert.Throws<ArgumentNullException>(() => new DirectorySyncher(null, _pathUtility, _fileCopierFactory));
+            Assert.Throws<ArgumentNullException>(() => new DirectorySyncher(null, _pathUtility, _fileCopierFactory, _maxParallelCopies));
         }
 
         [Test]
         public void ConstructorTest_ShouldThrowArgumentNullExceptionWithNullPathUtility()
         {
-            Assert.Throws<ArgumentNullException>(() => new DirectorySyncher(_fileSystem, null, _fileCopierFactory));
+            Assert.Throws<ArgumentNullException>(() => new DirectorySyncher(_fileSystem, null, _fileCopierFactory, _maxParallelCopies));
         }
 
         [Test]
         public void ConstructorTest_ShouldThrowArgumentNullExceptionWithFileCopierFactory()
         {
-            Assert.Throws<ArgumentNullException>(() => new DirectorySyncher(_fileSystem, _pathUtility, null));
+            Assert.Throws<ArgumentNullException>(() => new DirectorySyncher(_fileSystem, _pathUtility, null, _maxParallelCopies));
         }
         // ReSharper restore ObjectCreationAsStatement
 

@@ -5,7 +5,7 @@ using CapuchinSync.Core.Interfaces;
 
 namespace CapuchinSync.Core
 {
-    public class FileSystem : IFileSystem
+    public class FileSystem : Loggable, IFileSystem
     {
         /// <summary>
         /// Determines whether or not a file exists.
@@ -37,7 +37,9 @@ namespace CapuchinSync.Core
         }
 
         private static object FileCopyCountLock = new object();
+        private static object FileCopyErrorCountLock = new object();
         public static int FileCopyCount = 0;
+        public static int FileCopyErrorCount = 0;
 
         /// <summary>
         /// Copies a file from <see cref="sourcePath" /> to <see cref="targetPath" />.
@@ -47,7 +49,22 @@ namespace CapuchinSync.Core
         /// <param name="targetPath">The target path.</param>
         public void CopyFileAndOverwriteIfItExists(string sourcePath, string targetPath)
         {
-            File.Copy(sourcePath, targetPath, true);
+            if (File.Exists(targetPath))
+            {
+                File.SetAttributes(targetPath, FileAttributes.Normal);
+            }
+            try
+            {
+                File.Copy(sourcePath, targetPath, true);
+            }
+            catch
+            {
+                lock (FileCopyErrorCountLock)
+                {
+                    FileCopyErrorCount++;
+                }
+                throw;
+            }
             lock (FileCopyCountLock)
             {
                 FileCopyCount++;

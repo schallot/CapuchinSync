@@ -12,13 +12,24 @@ namespace CapuchinSync.Core.DirectorySynchronization
         private int _filesExamined;
         private readonly IFileCopierFactory _fileCopierFactory;
         private readonly ILogViewer _logViewer;
+        private readonly int _maxParallelCopies;
 
-        public DirectorySyncher(IFileSystem fileSystem, IPathUtility pathUtility, IFileCopierFactory fileCopierFactory, ILogViewer logViewer = null)
+        public DirectorySyncher(IFileSystem fileSystem, IPathUtility pathUtility, IFileCopierFactory fileCopierFactory, int maxParallelCopies, ILogViewer logViewer = null)
         {
             if(fileSystem == null) throw new ArgumentNullException(nameof(fileSystem));
             if(pathUtility == null) throw new ArgumentNullException(nameof(pathUtility));
             if(fileCopierFactory == null) throw new ArgumentNullException(nameof(fileCopierFactory));
+            _maxParallelCopies = maxParallelCopies;
+            if (maxParallelCopies < 0)
+            {
+                _maxParallelCopies = 1;
+            }
+            if (maxParallelCopies > 128)
+            {
+                _maxParallelCopies = 128;
+            }
             Trace($"Creating instance of {nameof(DirectorySyncher)} with filesystem of type {fileSystem.GetType()}");
+            Info($"Setting maxParallelCopies to {_maxParallelCopies}.");
             _logViewer = logViewer;
             _fileCopierFactory = fileCopierFactory;
         }
@@ -37,11 +48,21 @@ namespace CapuchinSync.Core.DirectorySynchronization
             // Each group contains all files that match a particular hash.  This will let us limit the copying of a 
             // files with that hash to at most once over the network, with all subsequent copies happening locally
             Parallel.ForEach(hashGroups,
-                new ParallelOptions { MaxDegreeOfParallelism = 6 },
+                new ParallelOptions { MaxDegreeOfParallelism = _maxParallelCopies },
                 ProcessHashGrouping);
 
             stopwatch.Stop();
-            Info($"Finished synchronization of {_filesExamined} files after {FileSystem.FileCopyCount} file copies in {(int)(stopwatch.ElapsedMilliseconds/1000f)} seconds.");
+            if (FileSystem.FileCopyErrorCount == 0)
+            {
+                Info($"Successfully synchronized {_filesExamined} files after {FileSystem.FileCopyCount} file" +
+                     $" copies in {(int) (stopwatch.ElapsedMilliseconds / 1000f)} seconds.");
+            }
+            else
+            {
+                Error($"Successfully synchronized {_filesExamined} files after {FileSystem.FileCopyCount} file" +
+                     $" copies with {FileSystem.FileCopyErrorCount} failed copies" +
+                     $" in {(int)(stopwatch.ElapsedMilliseconds / 1000f)} seconds.");
+            }
             _logViewer?.ViewLogs(AllLogEntries);
             return 0;
         }
