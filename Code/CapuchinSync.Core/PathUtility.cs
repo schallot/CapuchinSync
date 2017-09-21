@@ -32,10 +32,11 @@ namespace CapuchinSync.Core
         // Is case-insensitive, so definitely is only fully useful on windows file systems.
         public bool IsSubPathOrEqualTo(string parentPath, string childPath)
         {
-            var parentUri = new Uri(parentPath);
-            var childUri = new Uri(childPath);
-            var result = parentUri.IsBaseOf(childUri);
-            return result;
+            return childPath.IsSubPathOf(parentPath);
+            //var parentUri = new Uri(parentPath);
+            //var childUri = new Uri(childPath);
+            //var result = parentUri.IsBaseOf(childUri);
+            //return result;
         }
 
         public string CalculateRelativePath(string rootDirectory, string fileFullPath)
