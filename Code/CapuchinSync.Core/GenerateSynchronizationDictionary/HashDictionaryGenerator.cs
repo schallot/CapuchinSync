@@ -14,17 +14,28 @@ namespace CapuchinSync.Core.GenerateSynchronizationDictionary
         {
             if(arguments == null) throw new ArgumentNullException(nameof(arguments));
 
-            var hashes = new List<IFileHasher>();
+            var hashedFiles = new List<IFileHasher>();
             Stopwatch watch = new Stopwatch();
             watch.Restart();
-            var rootDir = arguments.RootDirectory;
+            var rootDirectories = arguments.RootDirectories;
+
+            // We'll make sure that we only read in each file once, by not bothering to 
+            // read in directories that are subdirectories of others.
+            var combinedDirectories = new List<string>();
+            foreach (var dir in rootDirectories)
+            {
+                if (!combinedDirectories.Any(x => pathUtility.IsSubPathOrEqualTo(x, dir)))
+                {
+                    combinedDirectories.Add(dir);
+                }
+            }
 
             // Because the actual enumeration of the filesystem happens at the evaluation of the
             // return of EnumerateFilesInDirectory, we need to look for file system errors at the 
             // enumeration, and not at the actual call of EnumerateFilesInDirectory
             try
             {
-                var allFiles = fileSystem.EnumerateFilesInDirectory(rootDir);
+                var allFiles = combinedDirectories.SelectMany(fileSystem.EnumerateFilesInDirectory);
                 Parallel.ForEach(allFiles, file =>
                 {
                     FileCount++;
@@ -32,36 +43,45 @@ namespace CapuchinSync.Core.GenerateSynchronizationDictionary
                     if(IsFileNameAMatch(file, Constants.HashFileName, pathUtility)
                         || IsFileNameAMatch(file, Constants.BackupHashFileName, pathUtility)) return;
                     var hasher = hasherFactory.CreateHasher(file);
-                    hashes.Add(hasher);
+                    hashedFiles.Add(hasher);
                 });
             }
             catch (Exception e)
             {
-                throw new Exception($"Enumeration of directory {rootDir} failed: {e.InnerException?.Message}", e);
+                throw new Exception($"Enumeration of a directory failed: {e.InnerException?.Message}", e);
             }
 
-            HashDictionaryFilepath = pathUtility.Combine(rootDir, Constants.HashFileName);
-            var backupLocation = HashDictionaryFilepath + ".old";
-            StringBuilder sb = new StringBuilder();
-            var now = dateTimeProvider.Now;
-            sb.AppendLine($"{hashes.Count} files found in {rootDir} on {dateTimeProvider.GetDateString(now)} at {dateTimeProvider.GetTimeString(now)}");
-            foreach (var hash in hashes.OrderBy(x=>x.RelativePath))
+            foreach (var rootDir in rootDirectories)
             {
-                sb.AppendLine(hash.DictionaryEntryString);
+                HashDictionaryFilepath = pathUtility.Combine(rootDir, Constants.HashFileName);
+                var backupLocation = HashDictionaryFilepath + ".old";
+                StringBuilder sb = new StringBuilder();
+                var now = dateTimeProvider.Now;
+                sb.AppendLine($"{hashedFiles.Count} files found in {rootDir} on {dateTimeProvider.GetDateString(now)} at {dateTimeProvider.GetTimeString(now)}");
+                var hashedFilesInRootDir = hashedFiles.Where(x =>
+                    {
+                        var result = pathUtility.IsSubPathOrEqualTo(rootDir, x.FullPath);
+                        return result;
+                    })
+                    .OrderBy(x => x.FullPath).ToArray();
+                foreach (var hashed in hashedFilesInRootDir)
+                {
+                    sb.AppendLine(hashed.GetDictionaryEntryString(rootDir));
+                }
+                // If an old backup file exists, go ahead and delete it.
+                if (fileSystem.DoesFileExist(backupLocation))
+                {
+                    fileSystem.DeleteFile(backupLocation);
+                }
+                // Now, if an old dictionary exists, move it to the backup location
+                if (fileSystem.DoesFileExist(HashDictionaryFilepath))
+                {
+                    fileSystem.MoveFile(HashDictionaryFilepath, backupLocation);
+                }
+                fileSystem.WriteAsUtf8TextFile(HashDictionaryFilepath, sb.ToString());
+
+                Info($"Hashes written to {HashDictionaryFilepath}");
             }
-            // If an old backup file exists, go ahead and delete it.
-            if (fileSystem.DoesFileExist(backupLocation))
-            {
-                fileSystem.DeleteFile(backupLocation);
-            }
-            // Now, if an old dictionary exists, move it to the backup location
-            if (fileSystem.DoesFileExist(HashDictionaryFilepath))
-            {
-                fileSystem.MoveFile(HashDictionaryFilepath, backupLocation);
-            }
-            fileSystem.WriteAsUtf8TextFile(HashDictionaryFilepath, sb.ToString());
-            
-            Info($"Hashes written to {HashDictionaryFilepath}");
 
             watch.Stop();
             Info($"Finished processing {FileCount} files in {watch.ElapsedMilliseconds / 1000d} seconds.");

@@ -2,7 +2,7 @@
 {
     public interface IFileHasher
     {
-        string RelativePath { get; }
-        string DictionaryEntryString { get; }
+        string FullPath { get; }
+        string GetDictionaryEntryString(string rootDirectory);
     }
 }

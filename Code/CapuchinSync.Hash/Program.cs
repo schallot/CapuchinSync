@@ -29,7 +29,7 @@ namespace CapuchinSync.Hash
             var dateTimeProvider = new DateTimeProvider();
             try
             {
-                var hasherFactory = new FileHasherFactory(hashUtility, parser.Arguments.RootDirectory);
+                var hasherFactory = new FileHasherFactory(hashUtility, pathUtility);
                 var hasherDictionaryGenerator =
                     new HashDictionaryGenerator(parser.Arguments, fileSystem, pathUtility, hasherFactory, dateTimeProvider);
                 Info($"Finished generating {hasherDictionaryGenerator.HashDictionaryFilepath}");
