@@ -38,7 +38,9 @@ namespace CapuchinSync.Core.GenerateSynchronizationDictionary
             }
             Debug($"Received {args.Count} command line arguments: [<{string.Join(">,<", args)}>]");
             
-            var directories = args.Where(x=> x.StartsWith(DirectoryPrefix, StringComparison.InvariantCultureIgnoreCase)).ToArray();
+            var directories = args.Where(x=> x.StartsWith(DirectoryPrefix, StringComparison.InvariantCultureIgnoreCase))
+                .Select(x=>x.Substring(DirectoryPrefix.Length))
+                .ToArray();
             args = args.Where(x => !directories.Contains(x)).ToList();
 
             var nonExistentDirectories = directories.Where(x => !fileSystem.DoesDirectoryExist(x)).ToArray();

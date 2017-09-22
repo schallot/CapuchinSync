@@ -67,6 +67,14 @@ namespace CapuchinSync.Core.Tests.GenerateSynchronizationDictionary
         [Test]
         public void Constructor_BasicHashTest()
         {
+            _pathUtility.IsSubPathOrEqualTo(Arg.Any<string>(), Arg.Any<string>()).Returns(x =>
+            {
+                var arg1 = x[0] as string;
+                if (arg1 == TestRootDir) return true;
+                return false;
+            }); // We only have one root directory to worry about here, so all paths we work with will be in that directory.
+            
+
             _generator = new HashDictionaryGenerator(_arguments, _fileSystem, _pathUtility, _fileHasherFactory, _dateTimeProvider);
             Assert.AreEqual(1, _filesWritten.Count, "Expected exactly one file to have been written.");
             Assert.AreEqual($"{TestRootDir}\\{Constants.HashFileName}",_filesWritten.First().Item1, "Written to unexpected file");

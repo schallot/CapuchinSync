@@ -47,21 +47,12 @@ namespace CapuchinSync.Core
                 rootDirectory = rootDirectory + "\\";
             }
             StringBuilder builder = new StringBuilder(1024);
-            bool success = PathRelativePathTo(builder, rootDirectory, 0, fileFullPath, 0);
+            PathRelativePathTo(builder, rootDirectory, 0, fileFullPath, 0);
             var result = builder.ToString();
             if (result.StartsWith(".\\"))
             {
                 result = result.Substring(2);
             }
-
-            if (result.StartsWith(".."))
-            {
-                int x = 22;
-
-                var isSub = IsSubPathOrEqualTo(rootDirectory, fileFullPath);
-
-            }
-
             return result;
         }
 

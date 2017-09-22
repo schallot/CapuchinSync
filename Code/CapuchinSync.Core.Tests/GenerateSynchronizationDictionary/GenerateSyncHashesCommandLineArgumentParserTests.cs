@@ -36,7 +36,7 @@ namespace CapuchinSync.Core.Tests.GenerateSynchronizationDictionary
 
             Assert.IsNotNull(parser.Arguments, "Expected arguments to be non-null");
             Assert.AreEqual(1, parser.Arguments.RootDirectories.Length, "Expected root directories to contain a single entry.");
-            Assert.AreEqual(rootDir, parser.Arguments.RootDirectories.First(), "Unexpected root directory");
+            Assert.AreEqual("blah", parser.Arguments.RootDirectories.First(), "Unexpected root directory");
         }
 
         [Test]
