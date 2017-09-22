@@ -115,7 +115,7 @@ namespace CapuchinSync.Core.Tests.GenerateSynchronizationDictionary
                 _generator = new HashDictionaryGenerator(_arguments, _fileSystem, _pathUtility, _fileHasherFactory, _dateTimeProvider);
             });
             
-            Assert.IsTrue(ex.Message.Contains($"Enumeration of directory {TestRootDir} failed: BLAH!"));
+            Assert.IsTrue(ex.Message.Contains($"Enumeration of a directory failed: BLAH!"));
         }
         
         [Test]

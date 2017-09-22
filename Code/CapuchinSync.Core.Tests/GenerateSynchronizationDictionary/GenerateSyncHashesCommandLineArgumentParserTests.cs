@@ -22,7 +22,7 @@ namespace CapuchinSync.Core.Tests.GenerateSynchronizationDictionary
         [Test]
         public void Constructor_EverythingShouldBePeachy()
         {
-            const string rootDir = "blah";
+            const string rootDir = "dir:blah";
             var parser = new GenerateSyncHashesCommandLineArgumentParser(new[] {rootDir}, _fileSystem);
 
             Assert.AreEqual(Constants.EverythingsJustPeachyReturnCode, parser.ErrorNumber, "Expected everything to be peachy");
@@ -31,7 +31,7 @@ namespace CapuchinSync.Core.Tests.GenerateSynchronizationDictionary
         [Test]
         public void Constructor_RootDirectoryShouldBeParsedFromFirstArgument()
         {
-            const string rootDir = "blah";
+            const string rootDir = "dir:blah";
             var parser = new GenerateSyncHashesCommandLineArgumentParser(new[] { rootDir }, _fileSystem);
 
             Assert.IsNotNull(parser.Arguments, "Expected arguments to be non-null");
@@ -42,7 +42,7 @@ namespace CapuchinSync.Core.Tests.GenerateSynchronizationDictionary
         [Test]
         public void Constructor_ExtensionsToExclude_ShouldBeEmptyWhenNoExtensionsAreSpecified()
         {
-            const string rootDir = "blah";
+            const string rootDir = "dir:blah";
             var parser = new GenerateSyncHashesCommandLineArgumentParser(new[] { rootDir }, _fileSystem);
 
             Assert.IsNotNull(parser.Arguments, "Expected arguments to be non-null");
@@ -54,7 +54,7 @@ namespace CapuchinSync.Core.Tests.GenerateSynchronizationDictionary
         {
             const string extension1 = "pdb";
             const string extension2 = "suo";
-            const string rootDir = "blah";
+            const string rootDir = "dir:blah";
             const string pref = GenerateSyncHashesCommandLineArgumentParser.ExcludeFilePrefix;
             var parser = new GenerateSyncHashesCommandLineArgumentParser(new[] { rootDir, $"{pref}{extension1}", $"{pref}{extension2}" }, _fileSystem);
 
@@ -74,7 +74,7 @@ namespace CapuchinSync.Core.Tests.GenerateSynchronizationDictionary
         {
             const string extension1 = "pdb";
             const string extension2 = "suo";
-            const string rootDir = "blah";
+            const string rootDir = "dir:blah";
             const string pref = GenerateSyncHashesCommandLineArgumentParser.ExcludeFilePrefix;
             var parser = new GenerateSyncHashesCommandLineArgumentParser(new[] { rootDir, $"{pref.ToUpperInvariant()}{extension1}", $"{pref.ToLowerInvariant()}{extension2}" }, _fileSystem);
 
@@ -94,7 +94,7 @@ namespace CapuchinSync.Core.Tests.GenerateSynchronizationDictionary
         {
             const string extension1 = "pdb";
             const string extension2 = "suo";
-            const string rootDir = "blah";
+            const string rootDir = "dir:blah";
             const string pref = GenerateSyncHashesCommandLineArgumentParser.ExcludeFilePrefix;
             var parser = new GenerateSyncHashesCommandLineArgumentParser(new[] { rootDir, $"{pref.ToUpperInvariant()}.{extension1}", $"{pref.ToLowerInvariant()}.{extension2}" }, _fileSystem);
 
@@ -114,7 +114,7 @@ namespace CapuchinSync.Core.Tests.GenerateSynchronizationDictionary
         {
             const string extension1 = "pdb";
             const string extension2 = "suo";
-            const string rootDir = "blah";
+            const string rootDir = "dir:blah";
             const string pref = GenerateSyncHashesCommandLineArgumentParser.ExcludeFilePrefix;
             var parser = new GenerateSyncHashesCommandLineArgumentParser(new[] { rootDir, $"{pref.ToUpperInvariant()}*{extension1}", $"{pref.ToLowerInvariant()}*{extension2}" }, _fileSystem);
 
@@ -141,14 +141,23 @@ namespace CapuchinSync.Core.Tests.GenerateSynchronizationDictionary
         {
             _fileSystem = Substitute.For<IFileSystem>();
             _fileSystem.DoesDirectoryExist(Arg.Any<string>()).Returns(false);
-            var parser = new GenerateSyncHashesCommandLineArgumentParser(new [] { "thisIsTheDirectoryArgumentAndShouldBeFine" }, _fileSystem);
+            var parser = new GenerateSyncHashesCommandLineArgumentParser(new [] { "dir:thisIsTheDirectoryArgumentAndShouldBeFine" }, _fileSystem);
             Assert.AreEqual(GenerateSyncHashesCommandLineArgumentParser.ErrorCodes.DirectoryDoesNotExist, parser.ErrorNumber);
         }
 
         [Test]
         public void Constructor_ShouldTriggerUnrecognizedArgumentErrorCode()
         {
-            var parser = new GenerateSyncHashesCommandLineArgumentParser(new [] { "thisIsTheDirectoryArgumentAndShouldBeFine", "invalidPrefix:whatever"}, _fileSystem);
+            const string directoryArg = "dir:thisIsTheDirectoryArgumentAndShouldBeFine";
+            const string invalidPrefixArg = "invalidPrefix:whatever";
+            _fileSystem = Substitute.For<IFileSystem>();
+            _fileSystem.DoesDirectoryExist(Arg.Any<string>()).Returns(x =>
+            {
+                var arg = x[0] as string;
+                if (arg == invalidPrefixArg) return false;
+                return true;
+            });
+            var parser = new GenerateSyncHashesCommandLineArgumentParser(new [] { directoryArg, invalidPrefixArg}, _fileSystem);
             Assert.AreEqual(GenerateSyncHashesCommandLineArgumentParser.ErrorCodes.UnrecognizedArgument, parser.ErrorNumber);
         }
 

@@ -16,11 +16,12 @@ namespace CapuchinSync.Core.GenerateSynchronizationDictionary
 
         public int ErrorNumber { get; }
         public const string ExcludeFilePrefix = "XF:";
+        public const string DirectoryPrefix = "DIR:";
 
         public GenerateSyncHashesCommandLineArgumentParser(string[] commandLineArgs, IFileSystem fileSystem)
         {
             string exampleArguments = "Arguments should be supplied in the form of" +
-                                            $"\r\n\t<Directory> [AdditionalDirectory1 ...] [{ExcludeFilePrefix}<FileExcludePattern> ...]" +
+                                            $"\r\n\t{DirectoryPrefix}<Directory> [{DirectoryPrefix}AdditionalDirectory1 ...] [{ExcludeFilePrefix}<FileExcludePattern> ...]" +
                                             $"\r\n\tFor example, <C:\\Directory1 C:\\Directory2 {ExcludeFilePrefix}*.pdb {ExcludeFilePrefix}*.suo>.";           
 
             var args = new List<string>();
@@ -37,7 +38,7 @@ namespace CapuchinSync.Core.GenerateSynchronizationDictionary
             }
             Debug($"Received {args.Count} command line arguments: [<{string.Join(">,<", args)}>]");
             
-            var directories = args.Where(x=> !x.StartsWith(ExcludeFilePrefix, StringComparison.InvariantCultureIgnoreCase)).ToArray();
+            var directories = args.Where(x=> x.StartsWith(DirectoryPrefix, StringComparison.InvariantCultureIgnoreCase)).ToArray();
             args = args.Where(x => !directories.Contains(x)).ToList();
 
             var nonExistentDirectories = directories.Where(x => !fileSystem.DoesDirectoryExist(x)).ToArray();
@@ -47,7 +48,9 @@ namespace CapuchinSync.Core.GenerateSynchronizationDictionary
                 ErrorNumber = ErrorCodes.DirectoryDoesNotExist;
                 return;
             }
-            
+            args = args.Where(x => !x.StartsWith(DirectoryPrefix, StringComparison.InvariantCultureIgnoreCase))
+                .ToList();
+
             var excludeArgs = args.Where(x => x.StartsWith(ExcludeFilePrefix, StringComparison.InvariantCultureIgnoreCase))
                 .Select(x=>x.Substring(ExcludeFilePrefix.Length)
                     .Trim()
