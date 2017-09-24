@@ -57,13 +57,13 @@ namespace CapuchinSync.Core.GenerateSynchronizationDictionary
                 var backupLocation = HashDictionaryFilepath + ".old";
                 StringBuilder sb = new StringBuilder();
                 var now = dateTimeProvider.Now;
-                sb.AppendLine($"{hashedFiles.Count} files found in {rootDir} on {dateTimeProvider.GetDateString(now)} at {dateTimeProvider.GetTimeString(now)}");
                 var hashedFilesInRootDir = hashedFiles.Where(x =>
                     {
                         var result = pathUtility.IsSubPathOrEqualTo(rootDir, x.FullPath);
                         return result;
                     })
                     .OrderBy(x => x.FullPath).ToArray();
+                sb.AppendLine($"{hashedFilesInRootDir.Length} files found in {rootDir} on {dateTimeProvider.GetDateString(now)} at {dateTimeProvider.GetTimeString(now)}");
                 foreach (var hashed in hashedFilesInRootDir)
                 {
                     sb.AppendLine(hashed.GetDictionaryEntryString(rootDir));
