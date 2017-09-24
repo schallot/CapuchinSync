@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -67,8 +68,27 @@ namespace CapuchinSync.Core.DirectorySynchronization
             return 0;
         }
 
+        private class HashVerifierComparer : IEqualityComparer<IHashVerifier>
+        {
+            public bool Equals(IHashVerifier x, IHashVerifier y)
+            {
+                if (x == null || y == null) return false;
+                return x.FullTargetPath.Equals(y.FullTargetPath, StringComparison.InvariantCultureIgnoreCase)
+                       && x.FullSourcePath.Equals(y.FullSourcePath, StringComparison.InvariantCultureIgnoreCase);
+            }
+
+            public int GetHashCode(IHashVerifier obj)
+            {
+                return $"{obj.FullSourcePath}=>{obj.FullTargetPath}".GetHashCode();
+            }
+        }
+
         private void ProcessHashGrouping(IHashVerifier[] group)
         {
+            // If we're processing multiple hash dictionaries at once, we could potentially have multiple
+            // instances of IHashVerifier pointing to identical files.  We don't want to end up copying from 
+            // a file to itself, so we'll filter out all duplicates here.
+            group = group.Distinct(new HashVerifierComparer()).ToArray();
             var matchingHashes = group.Where(x => x.Status == HashVerifier.VerificationStatus.TargetFileMatchesHash).ToList();
             var misMatches = group.Where(x =>
                 x.Status == HashVerifier.VerificationStatus.TargetFileDoesNotMatchHash

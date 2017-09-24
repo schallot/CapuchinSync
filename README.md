@@ -14,16 +14,16 @@ CapuchinSync consists of two separate executables: CapuchinSync.Hash.exe, which 
 ```
 CapuchinSync.Hash dir:<directory> [...] [xf:<extensionToExclude> [...]] [verbosity:<loggingLevel>]
 
-	directory:          An absolute path to a directory for which a hash dictionary file should be created.  The dictionary will be written as a .capuchinSync file in this directory.  Note that if you wish to generate hash dictionaries for multiple nested directories, specifying all directories in one run of CapuchinSync.Hash will be more efficient than running CapuchinSync.Hash once for each directory, as the program will then be able to ensure that it only hashes each file once.
-	extensionToExclude: A file extension that should be excluded from the hash dictionaries that are created.
-	loggingLevel:       Trace, Debug, Info, Warning, Error, or Fatal.  All log statements less severe than this level will be filtered from the console.
+    directory:          An absolute path to a directory for which a hash dictionary file should be created.  The dictionary will be written as a .capuchinSync file in this directory.  Note that if you wish to generate hash dictionaries for multiple nested directories, specifying all directories in one run of CapuchinSync.Hash will be more efficient than running CapuchinSync.Hash once for each directory, as the program will then be able to ensure that it only hashes each file once.
+    extensionToExclude: A file extension that should be excluded from the hash dictionaries that are created.
+    loggingLevel:       Trace, Debug, Info, Warning, Error, or Fatal.  All log statements less severe than this level will be filtered from the console.
    
 CapuchinSync source:<sourceDir>;destination:<destinationDir> [...] [maxParallelCopies:<maxThreads>] [verbosity:<loggingLevel>] [openLogInEditor]
-	
+    
     sourceDir:          An absolute path to a directory for which CapuchinSync.Hash has been run.
     destinationDir:     An absolute path to a directory that will be synchronized with sourceDir.  Once the synchronization is complete, the contents in this directory will be updated to match the contents of sourceDir.
     maxThreads:         The maximum number of synchronous copies that will be allowed at any time.  This defaults to 8, but can  be any number in the range [1,128].
-	loggingLevel:       Trace, Debug, Info, Warning, Error, or Fatal.  All log statements less severe than this level will be filtered from the console.
+    loggingLevel:       Trace, Debug, Info, Warning, Error, or Fatal.  All log statements less severe than this level will be filtered from the console.
     openLogInEditor:    After synchronization is complete, write all log entries to a temporary text file and open that file in a text editor.  If NotePad++ is installed at C:\Program Files (x86)\Notepad++\notepad++.exe, it will be used.  Otherwise, Windows Notepad will be used.
 ```  
 **Examples**  
