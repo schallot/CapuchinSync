@@ -37,7 +37,7 @@ namespace CapuchinSync.Core.Tests.GenerateSynchronizationDictionary
             Files = new List<string>{File1, File2};
             _arguments = new GenerateSyncHashesArguments {RootDirectories = new []{TestRootDir}};
             _fileSystem = Substitute.For<IFileSystem>();
-            _fileSystem.EnumerateFilesInDirectory(TestRootDir).Returns(Files);
+            _fileSystem.EnumerateFilesInDirectory(TestRootDir,Arg.Any<IEnumerable<string>>(), Arg.Any<IEnumerable<string>>()).Returns(Files);
             _fileSystem.When(x=>x.WriteAsUtf8TextFile(Arg.Any<string>(), Arg.Any<string>())).Do(y =>
             {
                 _filesWritten.Add(new Tuple<string, string>(y[0] as string, y[1] as string));
@@ -117,7 +117,7 @@ namespace CapuchinSync.Core.Tests.GenerateSynchronizationDictionary
         public void Constructor_ShouldThrowEnumerationException()
         {
             _fileSystem = Substitute.For<IFileSystem>();
-            _fileSystem.EnumerateFilesInDirectory(Arg.Any<string>()).Returns(ErrorOnThirdItem());
+            _fileSystem.EnumerateFilesInDirectory(Arg.Any<string>(), Arg.Any<IEnumerable<string>>(), Arg.Any<IEnumerable<string>>()).Returns(ErrorOnThirdItem());
             var ex = Assert.Throws<Exception>(() =>
             {
                 _generator = new HashDictionaryGenerator(_arguments, _fileSystem, _pathUtility, _fileHasherFactory, _dateTimeProvider);
@@ -139,7 +139,7 @@ namespace CapuchinSync.Core.Tests.GenerateSynchronizationDictionary
             bool wasOldBackupFileDeleted = false;
 
             _fileSystem = Substitute.For<IFileSystem>();
-            _fileSystem.EnumerateFilesInDirectory(Arg.Any<string>()).Returns(new [] {"one", "two"});
+            _fileSystem.EnumerateFilesInDirectory(Arg.Any<string>(), Arg.Any<IEnumerable<string>>(), Arg.Any<IEnumerable<string>>()).Returns(new [] {"one", "two"});
             _fileSystem.DoesFileExist(dictionaryFile).Returns(true);
             _fileSystem.DoesFileExist(backupFile).Returns(true);
             _fileSystem.When(x=>x.DeleteFile(backupFile)).Do(x=> { wasOldBackupFileDeleted = true; });

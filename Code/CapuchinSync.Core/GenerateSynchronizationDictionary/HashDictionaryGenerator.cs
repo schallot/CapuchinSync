@@ -18,6 +18,9 @@ namespace CapuchinSync.Core.GenerateSynchronizationDictionary
             Stopwatch watch = new Stopwatch();
             watch.Restart();
             var rootDirectories = arguments.RootDirectories;
+            var extensionsToExclude = arguments.ExtensionsToExclude;
+            // there's no point in recording the hash of the list of hashes, or the backup version of this file.
+            var filesToExclude = new [] {Constants.HashFileName, Constants.BackupHashFileName};
 
             // We'll make sure that we only read in each file once, by not bothering to 
             // read in directories that are subdirectories of others.
@@ -35,13 +38,10 @@ namespace CapuchinSync.Core.GenerateSynchronizationDictionary
             // enumeration, and not at the actual call of EnumerateFilesInDirectory
             try
             {
-                var allFiles = combinedDirectories.SelectMany(fileSystem.EnumerateFilesInDirectory);
+                var allFiles = combinedDirectories.SelectMany(y=>fileSystem.EnumerateFilesInDirectory(y,extensionsToExclude,filesToExclude));
                 Parallel.ForEach(allFiles, file =>
                 {
                     FileCount++;
-                    // there's no point in recording the hash of the list of hashes, or the backup version of this file.
-                    if(IsFileNameAMatch(file, Constants.HashFileName, pathUtility)
-                        || IsFileNameAMatch(file, Constants.BackupHashFileName, pathUtility)) return;
                     var hasher = hasherFactory.CreateHasher(file);
                     hashedFiles.Add(hasher);
                 });
@@ -85,12 +85,6 @@ namespace CapuchinSync.Core.GenerateSynchronizationDictionary
 
             watch.Stop();
             Info($"Finished processing {FileCount} files in {watch.ElapsedMilliseconds / 1000d} seconds.");
-        }
-
-        private bool IsFileNameAMatch(string fullPath, string fileName, IPathUtility pathUtility)
-        {
-            return (fullPath.EndsWith(fileName, StringComparison.CurrentCultureIgnoreCase) && fileName.Equals(pathUtility.GetFileName(fullPath),
-                    StringComparison.InvariantCultureIgnoreCase));
         }
 
         /// <summary>

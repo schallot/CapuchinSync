@@ -14,7 +14,7 @@ namespace CapuchinSync.Core.Tests.FunctionalTests
             var testSet = TestSet1.ToList();
             WriteTestSet(testSet);
 
-            var results = FileSystem.EnumerateFilesInDirectory(TestSourceFolder).ToList();
+            var results = FileSystem.EnumerateFilesInDirectory(TestSourceFolder,null,null).ToList();
 
             var misMatches1 =
                 results.Where(x => !testSet.Any(y => y.FilePath.Equals(x, StringComparison.InvariantCultureIgnoreCase)))
