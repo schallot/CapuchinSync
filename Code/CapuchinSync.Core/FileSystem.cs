@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using CapuchinSync.Core.Interfaces;
 
@@ -86,9 +88,37 @@ namespace CapuchinSync.Core
         /// </summary>
         /// <param name="directoryPath">The directory path.</param>
         /// <returns></returns>
-        public IEnumerable<string> EnumerateFilesInDirectory(string directoryPath)
+        public IEnumerable<string> EnumerateFilesInDirectory(string directoryPath, IEnumerable<string> extensionsToExclude, IEnumerable<string> filesToExclude)
         {
-            return Directory.EnumerateFiles(directoryPath, "*", SearchOption.AllDirectories);
+            List<string> extExcludes = new List<string>();
+            List<string> fileExcludes = new List<string>();
+            if (extensionsToExclude != null)
+            {
+                extExcludes.AddRange(extensionsToExclude.Select(x=>x.Trim('.').Trim()).Where(x=>!string.IsNullOrWhiteSpace(x)));
+            }
+            if (filesToExclude != null)
+            {
+                fileExcludes.AddRange(filesToExclude.Select(x=>x.Trim()).Where(x=>!string.IsNullOrWhiteSpace(x)));
+            }
+
+            return Directory.EnumerateFiles(directoryPath, "*", SearchOption.AllDirectories)
+                .Where(x => !extExcludes.Any(y=>HasExtension(x,y)))
+                .Where(x=> !fileExcludes.Any(y=>IsFileNameMatchWithExtension(x,y)));
+        }
+
+        private static bool HasExtension(string filePath, string searchExtension)
+        {
+            var ext = Path.GetExtension(filePath);
+            if (string.IsNullOrWhiteSpace(ext)) return false;
+            if (ext.StartsWith(".")) ext = ext.TrimStart('.');
+            return searchExtension.Equals(ext, StringComparison.InvariantCultureIgnoreCase);
+        }
+
+        private static bool IsFileNameMatchWithExtension(string filePath, string searchNameWithExtension)
+        {
+            var fileName = Path.GetFileName(filePath);
+            if (string.IsNullOrWhiteSpace(fileName)) return false;
+            return fileName.Equals(searchNameWithExtension, StringComparison.InvariantCultureIgnoreCase);
         }
 
         /// <summary>

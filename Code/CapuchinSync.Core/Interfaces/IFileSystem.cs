@@ -42,8 +42,10 @@ namespace CapuchinSync.Core.Interfaces
         /// Enumerates the files in a directory, including all files in all subdirectories.
         /// </summary>
         /// <param name="directoryPath">The directory path.</param>
+        /// <param name="extensionsToExclude">Files having these extensions will be excluded. Matching will be case-insensitive.</param>
+        /// <param name="filesToExclude">Files matching these names (including extension) will be excluded.  Matching will be case-insensitive</param>
         /// <returns></returns>
-        IEnumerable<string> EnumerateFilesInDirectory(string directoryPath);
+        IEnumerable<string> EnumerateFilesInDirectory(string directoryPath, IEnumerable<string> extensionsToExclude, IEnumerable<string> filesToExclude);
         /// <summary>
         /// Moves a file from one location to another.
         /// </summary>
