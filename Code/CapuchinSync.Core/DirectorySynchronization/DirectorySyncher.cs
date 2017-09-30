@@ -73,13 +73,12 @@ namespace CapuchinSync.Core.DirectorySynchronization
             public bool Equals(IHashVerifier x, IHashVerifier y)
             {
                 if (x == null || y == null) return false;
-                return x.FullTargetPath.Equals(y.FullTargetPath, StringComparison.InvariantCultureIgnoreCase)
-                       && x.FullSourcePath.Equals(y.FullSourcePath, StringComparison.InvariantCultureIgnoreCase);
+                return x.FullTargetPath.Equals(y.FullTargetPath, StringComparison.InvariantCultureIgnoreCase);
             }
 
             public int GetHashCode(IHashVerifier obj)
             {
-                return $"{obj.FullSourcePath}=>{obj.FullTargetPath}".GetHashCode();
+                return $"{obj.FullTargetPath}".GetHashCode();
             }
         }
 
