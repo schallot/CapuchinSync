@@ -124,7 +124,7 @@ namespace CapuchinSync.Core
         /// <summary>
         /// Moves a file from one location to another.
         /// </summary>
-        /// <param name="originalLocation">The original location.</param>
+        /// /<param name="originalLocation">The original location.</param>
         /// <param name="targetLocation">The target location.</param>
         /// <exception cref="System.NotImplementedException"></exception>
         public void MoveFile(string originalLocation, string targetLocation)
@@ -139,6 +139,9 @@ namespace CapuchinSync.Core
         /// <exception cref="System.NotImplementedException"></exception>
         public void DeleteFile(string filePath)
         {
+            // https://stackoverflow.com/questions/1157246/unauthorizedaccessexception-trying-to-delete-a-file-in-a-folder-where-i-can-dele
+            // Trying to get around baffling System.UnauthorizedAccessException errors that are showing up, even when this process created the file that we're deleting.
+            File.SetAttributes(filePath, FileAttributes.Normal);
             File.Delete(filePath);
         }
 

@@ -68,15 +68,31 @@ namespace CapuchinSync.Core.GenerateSynchronizationDictionary
                 {
                     sb.AppendLine(hashed.GetDictionaryEntryString(rootDir));
                 }
-                // If an old backup file exists, go ahead and delete it.
-                if (fileSystem.DoesFileExist(backupLocation))
+                try
                 {
-                    fileSystem.DeleteFile(backupLocation);
+                    // If an old backup file exists, go ahead and delete it.
+                    if (fileSystem.DoesFileExist(backupLocation))
+                    {
+                        fileSystem.DeleteFile(backupLocation);
+                    }
+                    // Now, if an old dictionary exists, move it to the backup location
+                    if (fileSystem.DoesFileExist(HashDictionaryFilepath))
+                    {
+                        fileSystem.MoveFile(HashDictionaryFilepath, backupLocation);
+                    }
                 }
-                // Now, if an old dictionary exists, move it to the backup location
-                if (fileSystem.DoesFileExist(HashDictionaryFilepath))
+                catch (Exception e)
                 {
-                    fileSystem.MoveFile(HashDictionaryFilepath, backupLocation);
+                    Warn($"Failure while attempting to back up old hash dictionary at {HashDictionaryFilepath}.  We'll attempt to simply delete it.", e);
+                    try
+                    {
+                        fileSystem.DeleteFile(HashDictionaryFilepath);
+                    }
+                    catch (Exception ex)
+                    {
+                        Error($"Failed to delete old hash dictionary at {HashDictionaryFilepath}. Hash dictionary generation cannot continue.",ex);
+                        throw;
+                    }
                 }
                 fileSystem.WriteAsUtf8TextFile(HashDictionaryFilepath, sb.ToString());
 
