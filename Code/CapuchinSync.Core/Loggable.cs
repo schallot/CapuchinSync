@@ -51,7 +51,12 @@ namespace CapuchinSync.Core
         {
             var entry = new LogEntry(GetType(),severity, message, e);
             AllLogEntries.Add(entry);
-            LogEntries.Add(entry);
+            // TIL: Lists aren't thread-safe.
+            // https://stackoverflow.com/questions/3794171/under-what-circumstance-system-collections-arraylist-add-throws-indexoutofrangee
+            lock (LogEntries)
+            {
+                LogEntries.Add(entry);
+            }
             if (severity < LogThreshold) return;
             WriteToConsole(entry);
         }
