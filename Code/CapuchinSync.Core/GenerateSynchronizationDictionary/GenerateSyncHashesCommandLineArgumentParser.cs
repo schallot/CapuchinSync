@@ -17,11 +17,13 @@ namespace CapuchinSync.Core.GenerateSynchronizationDictionary
         public int ErrorNumber { get; }
         public const string ExcludeFilePrefix = "XF:";
         public const string DirectoryPrefix = "DIR:";
+        public const string IgnoreMissingDirectoriesArg = "IgnoreMissingDirectories";
 
         public GenerateSyncHashesCommandLineArgumentParser(string[] commandLineArgs, IFileSystem fileSystem)
         {
+            bool ignoreMissingDirectories = false;
             string exampleArguments = "Arguments should be supplied in the form of" +
-                                            $"\r\n\t{DirectoryPrefix}<Directory> [{DirectoryPrefix}AdditionalDirectory1 ...] [{ExcludeFilePrefix}<FileExcludePattern> ...]" +
+                                            $"\r\n\t{DirectoryPrefix}<Directory> [{DirectoryPrefix}AdditionalDirectory1 ...] [{ExcludeFilePrefix}<FileExcludePattern> ...] [{IgnoreMissingDirectoriesArg}]" +
                                             $"\r\n\tFor example, <C:\\Directory1 C:\\Directory2 {ExcludeFilePrefix}*.pdb {ExcludeFilePrefix}*.suo>.";           
 
             var args = new List<string>();
@@ -38,6 +40,12 @@ namespace CapuchinSync.Core.GenerateSynchronizationDictionary
             }
             Debug($"Received {args.Count} command line arguments: [<{string.Join(">,<", args)}>]");
             
+            if (args.Any(x => IgnoreMissingDirectoriesArg.Equals(x, StringComparison.InvariantCultureIgnoreCase)))
+            {
+                ignoreMissingDirectories = true;
+                args = args.Where(x => !IgnoreMissingDirectoriesArg.Equals(x, StringComparison.InvariantCultureIgnoreCase)).ToList();
+            }
+
             var directories = args.Where(x=> x.StartsWith(DirectoryPrefix, StringComparison.InvariantCultureIgnoreCase))
                 .Select(x=>x.Substring(DirectoryPrefix.Length))
                 .ToArray();
@@ -46,9 +54,12 @@ namespace CapuchinSync.Core.GenerateSynchronizationDictionary
             var nonExistentDirectories = directories.Where(x => !fileSystem.DoesDirectoryExist(x)).ToArray();
             if (nonExistentDirectories.Any())
             {
+                if (!ignoreMissingDirectories) { 
                 Error($"The following ({nonExistentDirectories.Length}) Directories do not exist: {string.Join(", ", nonExistentDirectories)}");
                 ErrorNumber = ErrorCodes.DirectoryDoesNotExist;
-                return;
+                return;}
+                Warn($"The following {nonExistentDirectories.Length} directories do not exist, but we're continuing with hash generation because argument {IgnoreMissingDirectoriesArg} was provided.: {string.Join(", ",nonExistentDirectories)}.");
+                directories = directories.Where(x => !nonExistentDirectories.Contains(x)).ToArray();
             }
             args = args.Where(x => !x.StartsWith(DirectoryPrefix, StringComparison.InvariantCultureIgnoreCase))
                 .ToList();
