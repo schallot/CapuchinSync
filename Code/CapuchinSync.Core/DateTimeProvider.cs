@@ -12,7 +12,7 @@ namespace CapuchinSync.Core
 
         public string GetDateString(DateTime time)
         {
-            return time.ToLongDateString();
+            return time.ToString("dddd, MMMM d, yyyy");
         }
 
         public DateTime Now => DateTime.Now;
