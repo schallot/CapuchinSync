@@ -12,11 +12,12 @@ CapuchinSync consists of two separate executables: CapuchinSync.Hash.exe, which 
 **Command Line Syntax**  
 
 ```
-CapuchinSync.Hash dir:<directory> [...] [xf:<extensionToExclude> [...]] [verbosity:<loggingLevel>]
+CapuchinSync.Hash dir:<directory> [...] [xf:<extensionToExclude> [...]] [verbosity:<loggingLevel>] [IgnoreMissingDirectories]
 
     directory:          An absolute path to a directory for which a hash dictionary file should be created.  The dictionary will be written as a .capuchinSync file in this directory.  Note that if you wish to generate hash dictionaries for multiple nested directories, specifying all directories in one run of CapuchinSync.Hash will be more efficient than running CapuchinSync.Hash once for each directory, as the program will then be able to ensure that it only hashes each file once.
     extensionToExclude: A file extension that should be excluded from the hash dictionaries that are created.
     loggingLevel:       Trace, Debug, Info, Warning, Error, or Fatal.  All log statements less severe than this level will be filtered from the console.
+	IgnoreMissingDirectories: By default, the program will throw an error if a specified directory is missing.  However, if this argument is present, errors relating to missing directories will be suppressed.  This can be useful if you have an automated process generating hashes for a large number of directories that might come and go.
    
 CapuchinSync source:<sourceDir>;destination:<destinationDir> [...] [maxParallelCopies:<maxThreads>] [verbosity:<loggingLevel>] [openLogInEditor]
     
@@ -30,7 +31,7 @@ CapuchinSync source:<sourceDir>;destination:<destinationDir> [...] [maxParallelC
 
 ```
 > CapuchinSync.Hash dir:\\remoteMachine\share
-> CapuchinSync.Hash dir:"C:\Source Folder 1" dir:"C:\Source Folder 1\Subdir" dir:"C:\Source Folder 2" 
+> CapuchinSync.Hash dir:"C:\Source Folder 1" dir:"C:\Source Folder 1\Subdir" dir:"C:\Source Folder 2" IgnoreMissingDirectories
 > CapuchinSync.Hash dir:C:\temp xf:pdb xf:obj
 > CapuchinSync.Hash dir:C:\temp verbosity:debug
 
