@@ -49,16 +49,22 @@ namespace CapuchinSync.Core
 
         private void CreateEntry(string message, LogEntry.LogSeverity severity, Exception e = null)
         {
-            var entry = new LogEntry(GetType(),severity, message, e);
-            AllLogEntries.Add(entry);
-            // TIL: Lists aren't thread-safe.
-            // https://stackoverflow.com/questions/3794171/under-what-circumstance-system-collections-arraylist-add-throws-indexoutofrangee
-            lock (LogEntries)
+            try
             {
-                LogEntries.Add(entry);
+                var entry = new LogEntry(GetType(), severity, message, e);
+                // TIL: Lists aren't thread-safe.
+                // https://stackoverflow.com/questions/3794171/under-what-circumstance-system-collections-arraylist-add-throws-indexoutofrangee
+                lock (LogEntries)
+                {
+                    LogEntries.Add(entry);
+                }
+                if (severity < LogThreshold) return;
+                WriteToConsole(entry);
             }
-            if (severity < LogThreshold) return;
-            WriteToConsole(entry);
+            catch (Exception ex)
+            {
+                Console.WriteLine("An error occurred while creating a {0} log entry with message {1}. {2}", severity, message, ex);
+            }
         }
 
         private void WriteToConsole(LogEntry entry)
